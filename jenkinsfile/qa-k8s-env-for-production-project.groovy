@@ -45,8 +45,7 @@ pipeline {
         stage('拉取git') {
             steps{
 				script{
-					sh "cd ${mod_git_base}"
-                    sh "git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
+					sh "cd ${mod_git_base} && git init && git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
                 }            
             }
         }
