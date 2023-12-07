@@ -10,11 +10,11 @@
 // git_path=gitlab……
 // git_branch
 //自定义参数
-def jar_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/target"
+def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/"
 def mod_docker_image_path="/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server"
 def script_path="/var/jenkins_home/workspace/jenkins/"
 def complete_name="${project_type}-${project_name}-${server_type}"
-def project_charm_dir="${chart_base}/124-qa"
+def project_chart_dir="${chart_base}/124-qa"
 def app_name
 if( "${server_type}" != "vue" ){
     // qa124-beidou-ema8-web-server
@@ -39,6 +39,15 @@ pipeline {
                 echo "${app_name}"
                 echo "${git_path}"
                 echo "${git_branch}"
+            }
+        }
+
+        stage('拉取git') {
+            steps{
+				script{
+					sh "cd ${mod_git_base}"
+                    sh "git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
+                }            
             }
         }
 
@@ -92,11 +101,11 @@ pipeline {
             steps {
                 script{
                     is_chart_exist=sh(
-                        script: "cd ${project_charm_dir} && ls |grep ${app_name}|wc -l",
+                        script: "cd ${project_chart_dir} && ls |grep ${app_name}|wc -l",
                         returnStdout: true
                     ).trim()
                     if( "${is_chart_exist}" == "0" ){
-                        sh "cp -r ${project_charm_dir}/${chart_mod}/ ${project_charm_dir}/${app_name}"
+                        sh "cp -r ${project_chart_dir}/${chart_mod}/ ${project_chart_dir}/${app_name}"
                     }
                 }
             }
@@ -118,9 +127,9 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     if( "${is_install}" == "0" ){
-                        sh "/usr/bin/helm install ${app_name} ${project_charm_dir}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        sh "/usr/bin/helm install ${app_name} ${project_chart_dir}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }else{
-                        sh "/usr/bin/helm upgrade ${app_name} ${project_charm_dir}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        sh "/usr/bin/helm upgrade ${app_name} ${project_chart_dir}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }
                 }
             }
