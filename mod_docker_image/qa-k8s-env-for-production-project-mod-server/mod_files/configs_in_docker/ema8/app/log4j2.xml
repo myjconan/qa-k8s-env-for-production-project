@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status=debug 可以查看log4j的装配过程 -->
+<configuration status="off" monitorInterval="60">
+	<properties>
+		<property name="LOG_HOME">/home/tong/ema8/mszq/app/logs</property>
+		<!-- 日志备份目录 -->
+		<property name="LOG_NAME">app</property>
+		<property name="ENCODE">UTF-8</property>
+	</properties>
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout charset="${ENCODE}" pattern="[%d{ABSOLUTE}] %5p %c{1}:%L - %m%n" />
+		</Console>
+		<RollingFile name="InfoLog" fileName="${LOG_HOME}/${LOG_NAME}-info.log" filePattern="${LOG_HOME}/${LOG_NAME}-info.log.%d{yyyy-MM-dd}">
+			<ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="${ENCODE}" pattern="[%d{ISO8601}] %5p %30c{1}:%4L - %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<!-- <SizeBasedTriggeringPolicy size="500MB" /> -->
+			</Policies>
+			<!--<DefaultRolloverStrategy max="50"/> -->
+		</RollingFile>
+
+		<RollingFile name="ErrorLog" fileName="${LOG_HOME}/${LOG_NAME}-error.log" filePattern="${LOG_HOME}/${LOG_NAME}-error.log.%d{yyyy-MM-dd}">
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="${ENCODE}" pattern="[%d{ISO8601}] %5p %30c{1}:%4L - %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<!-- <SizeBasedTriggeringPolicy size="500MB" /> -->
+			</Policies>
+			<!-- <DefaultRolloverStrategy max="50"/> -->
+		</RollingFile>
+		<Async name="Asynch" bufferSize="500000" blocking="false" includeLocation="true">
+			<appender-ref ref="InfoLog" />
+			<appender-ref ref="ErrorLog" />
+			<appender-ref ref="Console" />
+		</Async>
+	</appenders>
+	<loggers>
+		<!-- Root Logger -->
+		<root level="INFO">
+			<appender-ref ref="Asynch" />
+		</root>
+	</loggers>
+</configuration>

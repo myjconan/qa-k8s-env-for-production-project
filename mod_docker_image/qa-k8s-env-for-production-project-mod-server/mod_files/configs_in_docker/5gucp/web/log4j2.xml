@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status=debug 可以查看log4j的装配过程 -->
+<configuration status="off" monitorInterval="30" packages="com.ema.core.common">
+	<properties>
+		<property name="LOG_HOME">{{log_path}}</property>
+		<!-- 日志备份目录 -->
+		<property name="LOG_NAME">web01</property>
+		<property name="ENCODE">UTF-8</property>
+		<property name="LOG_PATTERN" value="[%d{ISO8601}] %5p %30c{1}:%4L - %m%n"/>
+	</properties>
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<!--输出日志的格式-->
+            <PatternLayout charset="${ENCODE}" pattern="${LOG_PATTERN}"/>
+            <!--控制台只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+		</Console>
+		<!-- 这个会打印出所有的info及以下级别的信息，默认按天打印，超过时间的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+		<RollingFile name="InfoLog" fileName="${LOG_HOME}/${LOG_NAME}-info.log" filePattern="${LOG_HOME}/${LOG_NAME}-info-%d{yyyy-MM-dd}_%i.log.gz">
+			<ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="${ENCODE}" pattern="${LOG_PATTERN}" />
+			<Policies>
+			<!--interval属性用来指定多久滚动一次，默认是1 hour-->
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<!--按日进行切分，限制单文件大小为 500MB,每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+				<SizeBasedTriggeringPolicy size="500MB" />
+			</Policies>
+			
+		<DefaultRolloverStrategy max="30">
+                    <Delete basePath="${LOG_HOME}/" maxDepth="2">
+                        <IfFileName glob="*.log.gz" />
+                    <!--!Note: 这里的age必须和filePattern协调, 后者是精确到HH, 这里就要写成xH, xd就不起作用
+                        另外, 数字最好>2, 否则可能造成删除的时候, 最近的文件还处于被占用状态,导致删除不成功!-->
+                    <!--7天-->
+                        <IfLastModified age="7d" />
+                    </Delete>
+                </DefaultRolloverStrategy>
+			<!--<DefaultRolloverStrategy max="50"/> -->
+		</RollingFile>
+
+		<RollingFile name="ErrorLog" fileName="${LOG_HOME}/${LOG_NAME}-error.log" filePattern="${LOG_HOME}/${LOG_NAME}-info-%d{yyyy-MM-dd}_%i.log.gz">
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout charset="${ENCODE}" pattern="${LOG_PATTERN}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<SizeBasedTriggeringPolicy size="500MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="50"/>
+		</RollingFile>
+		<Async name="Asynch" bufferSize="500000" blocking="false" includeLocation="true">
+			<appender-ref ref="InfoLog" />
+			<appender-ref ref="ErrorLog" />
+			<appender-ref ref="Console" />
+		</Async>
+	</appenders>
+	<loggers>
+		<!-- Root Logger -->
+		<root level="INFO">
+			<appender-ref ref="Asynch" />
+		</root>
+	</loggers>
+</configuration>

@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "ctc-5gucp-license.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: {{ template "ctc-5gucp-license.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ template "ctc-5gucp-license.fullname" . }}
+  template:
+    metadata:
+      name: {{ template "ctc-5gucp-license.fullname" . }}
+      labels:
+        version: {{ .Values.image.tag }}
+        name: {{ template "ctc-5gucp-license.fullname" . }}
+        app: {{ template "ctc-5gucp-license.fullname" . }}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - centos7-157
+      containers:
+      - name: {{ template "ctc-5gucp-license.fullname" . }}
+        image: "{{ .Values.image.repository }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - mountPath: /home/tong/nfs/
+          name: resource
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        - containerPort: 11098
+        - containerPort: 12097
+        readinessProbe:
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          tcpSocket:
+            port: {{ .Values.service.port }}
+        livenessProbe:
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          tcpSocket:
+            port: {{ .Values.service.port }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }} 
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","sleep 5"]
+        env:
+        - name: AppDeployIp
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: PodName
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- range $key, $val := .Values.environment }}
+        - name: {{ $key }}
+          value: {{ $val|quote }}
+        {{- end}}
+      hostAliases:
+      {{- range $key, $val := .Values.hostnames }}
+      - ip: {{ $key }}
+        hostnames:
+        {{- range $f :=  $val  }}
+        - {{ $f }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.imagePullSecrets.enable }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets.secretsname }}
+      {{- end }}
+      volumes:
+      - name: resource
+        nfs:
+          path: /home/mod-5gucp
+          server: 172.18.1.190 
+

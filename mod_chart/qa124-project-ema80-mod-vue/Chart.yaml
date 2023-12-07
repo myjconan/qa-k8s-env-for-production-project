@@ -1,0 +1,12 @@
+apiVersion: v1
+appVersion: v1
+description: Enterprise Communications Web
+engine: gotpl
+keywords:
+- ema80
+- vue
+maintainers:
+- email: 8574@dahantc.com
+  name: MaYinjian
+name: project_name
+version: v1
