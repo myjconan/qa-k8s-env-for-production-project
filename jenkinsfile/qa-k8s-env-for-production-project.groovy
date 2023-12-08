@@ -2,18 +2,20 @@
 // def harbor="172.18.1.157"
 // def chart_base="/home/k8s/chart"
 // def env.build_workpath="/home/k8s/build/project_image"
+//----------------------------------------------------------------------------------------
 //build with parameters参数
 // JOB_NAME
 // project_type=ema8
 // project_name=beidou
-// server_type=web
+// server_type=vue,web,app
 // git_path=gitlab……
 // git_branch
+//----------------------------------------------------------------------------------------
 //自定义参数
+def harbor_url="172.18.1.157"
 def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/"
-def mod_docker_image_path="/home/k8s/build/project_image/"
-def mod_chart_path="/home/k8s/chart/124-qa/"
-def script_path="/var/jenkins_home/workspace/jenkins/"
+def mod_docker_image_prefix_path="/home/k8s/build/project_image/"
+def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 def complete_name="${project_type}-${project_name}-${server_type}"
 def app_name
 if( "${server_type}" != "vue" ){
@@ -44,15 +46,15 @@ pipeline {
 				script{
                     //拉取最新构建mod
 					sh "mkdir -p ${mod_git_base} && cd ${mod_git_base} && git init && git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
-                    //恢复本地误删git
+                    //恢复git本地仓库误删文件
                     sh "git ls-files -d | xargs echo -e | xargs git checkout --"
                     //初始化构建目录
                     //mod_chart
-                    sh "rm -rf ${mod_chart_path}/{qa124-project-ema80-mod-vue,qa124-project-ema80-mod-server}"
-                    sh "cp -r ${mod_git_base}/mod_chart/* ${mod_chart_path}"
+                    sh "rm -rf ${mod_chart_prefix_path}/{qa124-project-ema80-mod-vue,qa124-project-ema80-mod-server}"
+                    sh "cp -r ${mod_git_base}/mod_chart/* ${mod_chart_prefix_path}"
                     //mod_docker_image
-                    sh "rm -rf ${mod_docker_image_path}/qa-k8s-env-for-production-project-mod-server"
-                    sh "cp -r ${mod_git_base}/mod_docker_image ${mod_docker_image_path}"
+                    sh "rm -rf ${mod_docker_image_prefix_path}/qa-k8s-env-for-production-project-mod-server"
+                    sh "cp -r ${mod_git_base}/mod_docker_image/qa-k8s-env-for-production-project-mod-server ${mod_docker_image_prefix_path}"
                 }            
             }
         }
@@ -82,7 +84,7 @@ pipeline {
         stage('准备镜像构建'){
             steps{
                 script{
-                    sh "bash ${script_path}/qa-k8s-env-for-production-project.sh prepare_for_docker_image ${complete_name}"
+                    sh "bash ${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh prepare_for_docker_image ${complete_name}"
                 }
             }
         }
@@ -90,7 +92,7 @@ pipeline {
         stage('构建镜像'){
             steps{
 				script{
-					sh "docker build -t '172.18.1.157/public/${app_name}:v1' ${mod_docker_image_path}"
+					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_prefix_path}"
 				}
             }
         }
@@ -98,7 +100,7 @@ pipeline {
         stage('镜像上传至harbor'){
             steps{
 				script{
-                    sh " docker push '172.18.1.157/public/${app_name}:v1'"
+                    sh " docker push '${harbor_url}/public/${app_name}:v1'"
 				}
             }
         }
@@ -107,11 +109,11 @@ pipeline {
             steps {
                 script{
                     is_chart_exist=sh(
-                        script: "cd ${mod_chart_path} && ls |grep ${app_name}|wc -l",
+                        script: "cd ${mod_chart_prefix_path} && ls |grep ${app_name}|wc -l",
                         returnStdout: true
                     ).trim()
                     if( "${is_chart_exist}" == "0" ){
-                        sh "cp -r ${mod_chart_path}/${chart_mod}/ ${mod_chart_path}/${app_name}"
+                        sh "cp -r ${mod_chart_prefix_path}/${chart_mod}/ ${mod_chart_prefix_path}/${app_name}"
                     }
                 }
             }
@@ -120,7 +122,7 @@ pipeline {
         stage('配置helm_chart'){
             steps {
                 script{
-                    sh "bash ${script_path}/qa-k8s-env-for-production-project.sh configure_helm_chart ${complete_name}"
+                    sh "bash ${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh configure_helm_chart ${complete_name}"
                 }
             }
         }
@@ -133,9 +135,9 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     if( "${is_install}" == "0" ){
-                        sh "/usr/bin/helm install ${app_name} ${mod_chart_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        sh "/usr/bin/helm install ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }else{
-                        sh "/usr/bin/helm upgrade ${app_name} ${mod_chart_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        sh "/usr/bin/helm upgrade ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }
                 }
             }

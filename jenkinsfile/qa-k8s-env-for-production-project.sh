@@ -1,6 +1,6 @@
 #! /bin/bash
 #全局路径
-project_database="/var/jenkins_home/workspace/jenkins/qa-k8s-env-for-production-project-database"
+project_database="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/database/qa-k8s-env-for-production-project-database.csv"
 mod_docker_image_path="/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server"
 #构建目录
 jar_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/target"
@@ -13,7 +13,32 @@ function error_exit() {
     exit 1
 }
 
-function query_db() {
+#数据库相关
+function database() {
+
+}
+
+function db_query_project_type_all() {
+    local col_name="project_name"
+    local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
+    echo $(awk -F "," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u)
+}
+
+function db_query_stripped_project_name_in_project_type() {
+    local project_type=${1:-1}
+    local col_name="project_name"
+    local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
+    echo $(awk -F "," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f2 | sort -u)
+}
+
+function db_query_service_type_in_project_type() {
+    local project_type=${1:-1}
+    local col_name="project_name"
+    local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
+    echo $(awk -F "," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f3 | sort -u)
+}
+
+function db_query_property() {
     local col_name=${1:-1}
     local project_name=${2:-1}
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
@@ -24,70 +49,72 @@ function query_db() {
     fi
 }
 
+#获取git分支
 function git_branch() {
     local token="wjUT7QBsL5vsL-ytGJUr"
     local gitlab_url="gitlab.dahantc.com"
     local project_name=${1:-1}
-    local project_id=$(query_db "git_id" $project_name)
+    local project_id=$(db_query_property "git_id" $project_name)
     for i in $(seq 1 11); do
         local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | grep -Ev "master" | tr "\n" "," | sed 's/,$//g')
         echo "master",$branch_list
     done
 }
 
+#准备镜像
 function prepare_for_docker_image() {
     local prefix_dir="/home/tong/"
     local complete_name=${1:-1}
     local project_type=$(echo $complete_name | cut -d '-' -f1 | head -n 1)
     local project_name=$(echo $complete_name | cut -d '-' -f2 | head -n 1)
     local service_type=$(echo $complete_name | cut -d '-' -f3 | head -n 1)
-    local resource_name=$(query_db "resource_name" $complete_name)
-    local service_port=$(query_db "service_port" $complete_name)
+    local resource_name=$(db_query_property "resource_name" $complete_name)
+    local service_port=$(db_query_property "service_port" $complete_name)
     if [[ $service_port == "-1" ]]; then
         error_exit "wrong service_port"
     fi
-    local service_httpnodePort=$(query_db "service_httpnodePort" $complete_name)
+    local service_httpnodePort=$(db_query_property "service_httpnodePort" $complete_name)
     if [[ $service_httpnodePort == "-1" ]]; then
         error_exit "wrong service_httpnodePort"
     fi
-    local debug_port=$(query_db "debug_port" $complete_name)
+    local debug_port=$(db_query_property "debug_port" $complete_name)
     if [[ $debug_port == "-1" ]] && [[ $service_type != "vue" ]]; then
         error_exit "wrong debug_port"
     fi
-    local debug_httpnodePort=$(query_db "debug_httpnodePort" $complete_name)
+    local debug_httpnodePort=$(db_query_property "debug_httpnodePort" $complete_name)
     if [[ $debug_httpnodePort == "-1" ]] && [[ $service_type != "vue" ]]; then
         error_exit "wrong debug_httpnodePort"
     fi
-    local service_dir=$(query_db "service_dir" $complete_name)
+    local service_dir=$(db_query_property "service_dir" $complete_name)
 
-    echo "清除上次构建残留"
-    #清除上次构建jar包
-    local files=$(cd $mod_docker_image_path && ls *.jar 2>/dev/null | wc -l)
-    if [ "$files" != "0" ]; then
-        rm $mod_docker_image_path/*.jar
-    fi
-    #清除上次构建vue包
-    files=$(cd $mod_docker_image_path && ls | grep dist 2>/dev/null | wc -l)
-    if [ "$files" != "0" ]; then
-        rm -rf "$mod_docker_image_path/dist"
-        rm "$mod_docker_image_path/default.conf"
-    fi
-    #清除上次构建Dockerfile
-    files=$(cd $mod_docker_image_path && ls | grep Dockerfile 2>/dev/null | wc -l)
-    if [ "$files" != "0" ]; then
-        rm "$mod_docker_image_path/Dockerfile"
-    fi
-    #清除上次构建配置文件
-    files=$(cd $mod_docker_image_path && ls | grep config 2>/dev/null | wc -l)
-    if [ "$files" != "0" ]; then
-        rm -rf "$mod_docker_image_path/config"
-        mkdir -p "$mod_docker_image_path/config"
-    fi
+    # echo "清除上次构建残留"
+    # #清除上次构建jar包
+    # local files=$(cd $mod_docker_image_path && ls *.jar 2>/dev/null | wc -l)
+    # if [ "$files" != "0" ]; then
+    #     rm $mod_docker_image_path/*.jar
+    # fi
+    # #清除上次构建vue包
+    # files=$(cd $mod_docker_image_path && ls | grep dist 2>/dev/null | wc -l)
+    # if [ "$files" != "0" ]; then
+    #     rm -rf "$mod_docker_image_path/dist"
+    #     rm "$mod_docker_image_path/default.conf"
+    # fi
+    # #清除上次构建Dockerfile
+    # files=$(cd $mod_docker_image_path && ls | grep Dockerfile 2>/dev/null | wc -l)
+    # if [ "$files" != "0" ]; then
+    #     rm "$mod_docker_image_path/Dockerfile"
+    # fi
+    # #清除上次构建配置文件
+    # files=$(cd $mod_docker_image_path && ls | grep config 2>/dev/null | wc -l)
+    # if [ "$files" != "0" ]; then
+    #     rm -rf "$mod_docker_image_path/config"
+    #     mkdir -p "$mod_docker_image_path/config"
+    # fi
     if [[ $(echo $service_type | grep "vue") != "" ]]; then
         #准备vue包
         cp -r "$vue_path/dist" "$mod_docker_image_path"
         #替换后端地址
-        local web_server_httpnodePort=$(query_db "service_httpnodePort" "${project_type}-${project_name}-web")
+        local web_server_httpnodePort=$(db_query_property "service_httpnodePort" "${project_type}-${project_name}-web")
         echo -e "const baseUrl = 'http://172.18.1.190:$web_server_httpnodePort'\nwindow._BASE_URL = baseUrl;" >>$mod_docker_image_path/dist/config.js
         #准备dockerfile
         cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_vue $mod_docker_image_path/Dockerfile
@@ -118,6 +145,7 @@ function prepare_for_docker_image() {
     fi
 }
 
+#配置helm_chart
 function configure_helm_chart() {
     local complete_name=${1:-1}
     local project_type=$(echo $complete_name | cut -d '-' -f1 | head -n 1)
@@ -131,10 +159,10 @@ function configure_helm_chart() {
         #qa124-beidou-ema8-web-server
         app_name="qa124-$project_name-$project_type-$service_type-server"
     fi
-    local service_port=$(query_db "service_port" $complete_name)
-    local service_httpnodePort=$(query_db "service_httpnodePort" $complete_name)
-    local debug_port=$(query_db "debug_port" $complete_name)
-    local debug_httpnodePort=$(query_db "debug_httpnodePort" $complete_name)
+    local service_port=$(db_query_property "service_port" $complete_name)
+    local service_httpnodePort=$(db_query_property "service_httpnodePort" $complete_name)
+    local debug_port=$(db_query_property "debug_port" $complete_name)
+    local debug_httpnodePort=$(db_query_property "debug_httpnodePort" $complete_name)
     #修改values.yaml
     sed -i "s#qa124_ema80_mod_server#${app_name}#g" ${project_chart_dir}/${app_name}/values.yaml
     sed -i "s#service1_port#${service_port}#g" ${project_chart_dir}/${app_name}/values.yaml
@@ -149,6 +177,8 @@ function configure_helm_chart() {
     #nfs
     cat ${project_chart_dir}/${app_name}/templates/statefulSet.yaml
 }
+
+#配置nacos
 function nacos() {
     local nacos_url="http://172.18.9.190:31876"
     local nacos_auth_url="$nacos_url/dhst/v1/auth/login"
@@ -213,13 +243,9 @@ function nacos() {
 
 }
 
-function database() {
-    echo "创建数据库"
-}
-
 #执行方法调用
 case "$1" in
-"query_db") query_db $2 $3 ;;
+"db_query_property") db_query_property $2 $3 ;;
 "git_branch") git_branch $2 ;;
 "prepare_for_docker_image") prepare_for_docker_image $2 ;;
 "configure_helm_chart") configure_helm_chart $2 ;;
