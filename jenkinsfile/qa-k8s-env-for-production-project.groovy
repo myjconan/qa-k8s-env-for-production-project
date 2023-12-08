@@ -17,6 +17,7 @@ def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_g
 def mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 def complete_name="${project_type}-${project_name}-${server_type}"
+def build_script="${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh"
 def app_name
 if( "${server_type}" != "vue" ){
     // qa124-beidou-ema8-web-server
@@ -44,17 +45,7 @@ pipeline {
         stage('初始化构建') {
             steps{
 				script{
-                    //拉取最新构建mod
-					sh "mkdir -p ${mod_git_base} && cd ${mod_git_base} && git init && git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
-                    //恢复git本地仓库误删文件
-                    sh "git ls-files -d | xargs echo -e | xargs git checkout --"
-                    //初始化构建目录
-                    //mod_chart
-                    sh "rm -rf ${mod_chart_prefix_path}/{qa124-project-ema80-mod-vue,qa124-project-ema80-mod-server}"
-                    sh "cp -r ${mod_git_base}/mod_chart/* ${mod_chart_prefix_path}"
-                    //mod_docker_image
-                    sh "rm -rf ${mod_docker_image_prefix_path}/qa-k8s-env-for-production-project-mod-server"
-                    sh "cp -r ${mod_git_base}/mod_docker_image/qa-k8s-env-for-production-project-mod-server ${mod_docker_image_prefix_path}"
+                    sh "bash ${build_script} init_build"
                 }            
             }
         }
@@ -84,7 +75,7 @@ pipeline {
         stage('准备镜像构建'){
             steps{
                 script{
-                    sh "bash ${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh prepare_for_docker_image ${complete_name}"
+                    sh "bash ${build_script} prepare_for_docker_image ${complete_name}"
                 }
             }
         }
@@ -122,7 +113,7 @@ pipeline {
         stage('配置helm_chart'){
             steps {
                 script{
-                    sh "bash ${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh configure_helm_chart ${complete_name}"
+                    sh "bash ${build_script} configure_helm_chart ${complete_name}"
                 }
             }
         }

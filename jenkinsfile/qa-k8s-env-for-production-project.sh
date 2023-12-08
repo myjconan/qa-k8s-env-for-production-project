@@ -14,9 +14,8 @@ function error_exit() {
 }
 
 #数据库相关
-function database() {
+function db_add_project() {
     echo "a"
-
 }
 
 function db_query_project_type_all() {
@@ -60,6 +59,24 @@ function git_branch() {
         local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | grep -Ev "master" | tr "\n" "," | sed 's/,$//g')
         echo "master",$branch_list
     done
+}
+
+#初始化构建
+function init_build() {
+    #拉取最新构建mod
+    mkdir -p ${mod_git_base}
+    cd ${mod_git_base}
+    git init
+    git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git
+    #恢复git本地仓库误删文件
+    git ls-files -d | xargs echo -e | xargs git checkout --
+    #初始化构建目录
+    #mod_chart
+    rm -rf ${mod_chart_prefix_path}/{qa124-project-ema80-mod-vue,qa124-project-ema80-mod-server}
+    cp -r ${mod_git_base}/mod_chart/* ${mod_chart_prefix_path}
+    #mod_docker_image
+    rm -rf ${mod_docker_image_prefix_path}/qa-k8s-env-for-production-project-mod-server
+    cp -r ${mod_git_base}/mod_docker_image/qa-k8s-env-for-production-project-mod-server ${mod_docker_image_prefix_path}
 }
 
 #准备镜像
@@ -241,7 +258,6 @@ function nacos() {
         sed -i "s#{{nacos_server}}#$nacos_url#g" "$mod_docker_image_path/config/app/bootstrap.properties"
         sed -i "s#{{nacos_namespace}}#$tenant_id#g" "$mod_docker_image_path/config/app/bootstrap.properties"
     fi
-
 }
 
 #执行方法调用
