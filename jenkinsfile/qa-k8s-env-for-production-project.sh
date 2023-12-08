@@ -23,21 +23,21 @@ function db_add_project() {
 function db_query_project_type_all() {
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -F "," -v OFS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u)
+    echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u | xargs | sed 's/[ ][ ]*/,/g')
 }
 
 function db_query_stripped_project_name_in_project_type() {
     local project_type=${1:-1}
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -F "," -v OFS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f2 | sort -u)
+    echo $(awk -v FS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f2 | sort -u | xargs | sed 's/[ ][ ]*/,/g')
 }
 
 function db_query_service_type_in_project_type() {
     local project_type=${1:-1}
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -F "," -v OFS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f3 | sort -u)
+    echo $(awk -v FS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f3 | sort -u | xargs | sed 's/[ ][ ]*/,/g')
 }
 
 function db_query_property() {
