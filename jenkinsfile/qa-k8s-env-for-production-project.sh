@@ -1,12 +1,14 @@
 #! /bin/bash
-#全局路径
-project_database="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/database/qa-k8s-env-for-production-project-database.csv"
-mod_docker_image_path="/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server"
+#git_base
+mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/"
+#数据库
+project_database="$mod_git_base/database/qa-k8s-env-for-production-project-database.csv"
 #构建目录
 jar_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/target"
 vue_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/"
-#helm chart目录
-project_chart_dir="/home/k8s/chart/124-qa"
+mod_chart_prefix_path="/home/k8s/chart/124-qa/"
+mod_docker_image_prefix_path="/home/k8s/build/project_image/"
+mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-project-mod-server/"
 
 function error_exit() {
     echo -e "$1" 1>&2
@@ -64,19 +66,29 @@ function git_branch() {
 #初始化构建
 function init_build() {
     #拉取最新构建mod
-    mkdir -p ${mod_git_base}
-    cd ${mod_git_base}
+    mkdir -p $mod_git_base
+    cd $mod_git_base
     git init
     git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git
     #恢复git本地仓库误删文件
     git ls-files -d | xargs echo -e | xargs git checkout --
     #初始化构建目录
-    #mod_chart
-    rm -rf ${mod_chart_prefix_path}/{qa124-project-ema80-mod-vue,qa124-project-ema80-mod-server}
-    cp -r ${mod_git_base}/mod_chart/* ${mod_chart_prefix_path}
-    #mod_docker_image
-    rm -rf ${mod_docker_image_prefix_path}/qa-k8s-env-for-production-project-mod-server
-    cp -r ${mod_git_base}/mod_docker_image/qa-k8s-env-for-production-project-mod-server ${mod_docker_image_prefix_path}
+    #mod_helm_chart
+    server_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum))
+    server_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum))
+    if [[ $server_mod_chart_md5_it_git != $server_mod_chart_md5 ]]; then
+        rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-server
+        cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-server $mod_chart_prefix_path
+    fi
+    vue_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum))
+    vue_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum))
+    if [[ $vue_mod_chart_md5_it_git != $vue_mod_chart_md5 ]]; then
+        rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-vue
+        cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-vue $mod_chart_prefix_path
+    fi
+    #清除上次构建镜像
+    rm -rf $mod_docker_image_path
+    cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server $mod_docker_image_prefix_path
 }
 
 #准备镜像
@@ -182,18 +194,18 @@ function configure_helm_chart() {
     local debug_port=$(db_query_property "debug_port" $complete_name)
     local debug_httpnodePort=$(db_query_property "debug_httpnodePort" $complete_name)
     #修改values.yaml
-    sed -i "s#qa124_ema80_mod_server#${app_name}#g" ${project_chart_dir}/${app_name}/values.yaml
-    sed -i "s#service1_port#${service_port}#g" ${project_chart_dir}/${app_name}/values.yaml
-    sed -i "s#service1_httpnodePort#${service_httpnodePort}#g" ${project_chart_dir}/${app_name}/values.yaml
+    sed -i "s#qa124_ema80_mod_server#${app_name}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
+    sed -i "s#service1_port#${service_port}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
+    sed -i "s#service1_httpnodePort#${service_httpnodePort}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
     if [[ $(echo $service_type | grep "vue") == "" ]]; then
-        sed -i "s#service2_port#${debug_port}#g" ${project_chart_dir}/${app_name}/values.yaml
-        sed -i "s#service2_httpnodePort#${debug_httpnodePort}#g" ${project_chart_dir}/${app_name}/values.yaml
+        sed -i "s#service2_port#${debug_port}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
+        sed -i "s#service2_httpnodePort#${debug_httpnodePort}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
     fi
     #修改Chart.yaml
-    sed -i "s#project_name#${app_name}#g" ${project_chart_dir}/${app_name}/Chart.yaml
+    sed -i "s#project_name#${app_name}#g" ${mod_chart_prefix_path}/${app_name}/Chart.yaml
     #配置/templates/statefulSet.yaml目录挂载
     #nfs
-    cat ${project_chart_dir}/${app_name}/templates/statefulSet.yaml
+    cat ${mod_chart_prefix_path}/${app_name}/templates/statefulSet.yaml
 }
 
 #配置nacos
