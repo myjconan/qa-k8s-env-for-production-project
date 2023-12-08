@@ -23,21 +23,21 @@ function db_add_project() {
 function db_query_project_type_all() {
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -F "," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u)
+    echo $(awk -F "," -v OFS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u)
 }
 
 function db_query_stripped_project_name_in_project_type() {
     local project_type=${1:-1}
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -F "," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f2 | sort -u)
+    echo $(awk -F "," -v OFS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f2 | sort -u)
 }
 
 function db_query_service_type_in_project_type() {
     local project_type=${1:-1}
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -F "," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f3 | sort -u)
+    echo $(awk -F "," -v OFS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f3 | sort -u)
 }
 
 function db_query_property() {
@@ -53,9 +53,9 @@ function db_query_property() {
 
 #获取git分支
 function git_branch() {
+    local project_name=${1:-1}
     local token="wjUT7QBsL5vsL-ytGJUr"
     local gitlab_url="gitlab.dahantc.com"
-    local project_name=${1:-1}
     local project_id=$(db_query_property "git_id" $project_name)
     for i in $(seq 1 11); do
         local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | grep -Ev "master" | tr "\n" "," | sed 's/,$//g')
@@ -72,16 +72,18 @@ function init_build() {
     git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git
     #恢复git本地仓库误删文件
     git ls-files -d | xargs echo -e | xargs git checkout --
+    #清除git本地仓库新增文件
+    git clean -df
     #初始化构建目录
     #mod_helm_chart
-    server_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum))
-    server_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum))
+    server_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
+    server_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
     if [[ $server_mod_chart_md5_it_git != $server_mod_chart_md5 ]]; then
         rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-server
         cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-server $mod_chart_prefix_path
     fi
-    vue_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum))
-    vue_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum))
+    vue_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
+    vue_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
     if [[ $vue_mod_chart_md5_it_git != $vue_mod_chart_md5 ]]; then
         rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-vue
         cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-vue $mod_chart_prefix_path
@@ -93,8 +95,8 @@ function init_build() {
 
 #准备镜像
 function prepare_for_docker_image() {
-    local prefix_dir="/home/tong/"
     local complete_name=${1:-1}
+    local prefix_dir="/home/tong/"
     local project_type=$(echo $complete_name | cut -d '-' -f1 | head -n 1)
     local project_name=$(echo $complete_name | cut -d '-' -f2 | head -n 1)
     local service_type=$(echo $complete_name | cut -d '-' -f3 | head -n 1)
@@ -116,30 +118,6 @@ function prepare_for_docker_image() {
         error_exit "wrong debug_httpnodePort"
     fi
     local service_dir=$(db_query_property "service_dir" $complete_name)
-
-    # echo "清除上次构建残留"
-    # #清除上次构建jar包
-    # local files=$(cd $mod_docker_image_path && ls *.jar 2>/dev/null | wc -l)
-    # if [ "$files" != "0" ]; then
-    #     rm $mod_docker_image_path/*.jar
-    # fi
-    # #清除上次构建vue包
-    # files=$(cd $mod_docker_image_path && ls | grep dist 2>/dev/null | wc -l)
-    # if [ "$files" != "0" ]; then
-    #     rm -rf "$mod_docker_image_path/dist"
-    #     rm "$mod_docker_image_path/default.conf"
-    # fi
-    # #清除上次构建Dockerfile
-    # files=$(cd $mod_docker_image_path && ls | grep Dockerfile 2>/dev/null | wc -l)
-    # if [ "$files" != "0" ]; then
-    #     rm "$mod_docker_image_path/Dockerfile"
-    # fi
-    # #清除上次构建配置文件
-    # files=$(cd $mod_docker_image_path && ls | grep config 2>/dev/null | wc -l)
-    # if [ "$files" != "0" ]; then
-    #     rm -rf "$mod_docker_image_path/config"
-    #     mkdir -p "$mod_docker_image_path/config"
-    # fi
     if [[ $(echo $service_type | grep "vue") != "" ]]; then
         #准备vue包
         cp -r "$vue_path/dist" "$mod_docker_image_path"
@@ -210,12 +188,12 @@ function configure_helm_chart() {
 
 #配置nacos
 function nacos() {
+    local project_name=${1:-1}
     local nacos_url="http://172.18.9.190:31876"
     local nacos_auth_url="$nacos_url/dhst/v1/auth/login"
     local nacos_namespace_url="$nacos_url/dhst/v1/console/namespaces?"
     local nacos_config_url="$nacos_url/dhst/v1/cs/configs"
     local nacos_accessToken=$(echo $(curl -s -X POST $nacos_auth_url -d 'username=dahantc&password=dahantc') | jq '.accessToken' | sed 's/\"//g')
-    local project_name=${1:-1}
     #检查namespace
     echo "检查${project_name}的nacos配置"
     local nacos_namespaces=$(echo $(curl -s -X GET $nacos_namespace_url))
@@ -272,7 +250,7 @@ function nacos() {
     fi
 }
 
-#执行方法调用
+#函数调用备注
 case "$1" in
 "db_query_property") db_query_property $2 $3 ;;
 "git_branch") git_branch $2 ;;
