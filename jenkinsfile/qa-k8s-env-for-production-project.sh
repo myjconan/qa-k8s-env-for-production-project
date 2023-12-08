@@ -73,7 +73,7 @@ function init_build() {
     #恢复git本地仓库误删文件
     git ls-files -d | xargs echo -e | xargs git checkout --
     #清除git本地仓库新增文件
-    git clean -df
+    git checkout . && git clean -xdf
     #初始化构建目录
     #mod_helm_chart
     server_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
