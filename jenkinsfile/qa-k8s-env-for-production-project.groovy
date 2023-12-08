@@ -11,10 +11,10 @@
 // git_branch
 //自定义参数
 def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/"
-def mod_docker_image_path="/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server"
+def mod_docker_image_path="/home/k8s/build/project_image/"
+def mod_chart_path="/home/k8s/chart/124-qa/"
 def script_path="/var/jenkins_home/workspace/jenkins/"
 def complete_name="${project_type}-${project_name}-${server_type}"
-def project_chart_dir="${chart_base}/124-qa"
 def app_name
 if( "${server_type}" != "vue" ){
     // qa124-beidou-ema8-web-server
@@ -32,25 +32,32 @@ pipeline {
     stages {
         stage('打印参数') {
             steps {
-                //系统变量
-                echo "${harbor}"
-                echo "${chart_base}"
                 //自定义
-                echo "${app_name}"
-                echo "${git_path}"
-                echo "${git_branch}"
+                echo "构建应用名称：${app_name}"
+                echo "git路径：${git_path}"
+                echo "git分支：${git_branch}"
             }
         }
 
-        stage('拉取git') {
+        stage('初始化构建') {
             steps{
 				script{
-					sh "cd ${mod_git_base} && git init && git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
+                    //拉取最新构建mod
+					sh "mkdir -p ${mod_git_base} && cd ${mod_git_base} && git init && git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git"
+                    //恢复本地误删git
+                    sh "git ls-files -d | xargs echo -e | xargs git checkout --"
+                    //初始化构建目录
+                    //mod_chart
+                    sh "rm -rf ${mod_chart_path}/{qa124-project-ema80-mod-vue,qa124-project-ema80-mod-server}"
+                    sh "cp -r ${mod_git_base}/mod_chart/* ${mod_chart_path}"
+                    //mod_docker_image
+                    sh "rm -rf ${mod_docker_image_path}/qa-k8s-env-for-production-project-mod-server"
+                    sh "cp -r ${mod_git_base}/mod_docker_image ${mod_docker_image_path}"
                 }            
             }
         }
 
-        stage('拉取git仓库源码') {
+        stage('拉取应用git源码') {
             steps{
 				script{
 					git branch: "${git_branch}", url: "git@${git_path}"
@@ -100,11 +107,11 @@ pipeline {
             steps {
                 script{
                     is_chart_exist=sh(
-                        script: "cd ${project_chart_dir} && ls |grep ${app_name}|wc -l",
+                        script: "cd ${mod_chart_path} && ls |grep ${app_name}|wc -l",
                         returnStdout: true
                     ).trim()
                     if( "${is_chart_exist}" == "0" ){
-                        sh "cp -r ${project_chart_dir}/${chart_mod}/ ${project_chart_dir}/${app_name}"
+                        sh "cp -r ${mod_chart_path}/${chart_mod}/ ${mod_chart_path}/${app_name}"
                     }
                 }
             }
@@ -126,9 +133,9 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     if( "${is_install}" == "0" ){
-                        sh "/usr/bin/helm install ${app_name} ${project_chart_dir}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        sh "/usr/bin/helm install ${app_name} ${mod_chart_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }else{
-                        sh "/usr/bin/helm upgrade ${app_name} ${project_chart_dir}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        sh "/usr/bin/helm upgrade ${app_name} ${mod_chart_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }
                 }
             }
