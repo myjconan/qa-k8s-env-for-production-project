@@ -15,6 +15,7 @@ function error_exit() {
 
 #数据库相关
 function database() {
+    echo "a"
 
 }
 
