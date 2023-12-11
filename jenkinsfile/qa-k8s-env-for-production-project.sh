@@ -66,6 +66,7 @@ function git_branch() {
 #初始化构建
 function init_build() {
     #拉取最新构建mod
+    echo "haha"
     mkdir -p $mod_git_base
     cd $mod_git_base
     git init
