@@ -52,6 +52,7 @@ pipeline {
         stage('拉取应用git源码') {
             steps{
 				script{
+                    echo "拉取应用git源码"
 					git branch: "${git_branch}", url: "git@${git_path}"
                 }            
             }
