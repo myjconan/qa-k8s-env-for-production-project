@@ -15,9 +15,13 @@ function error_exit() {
     exit 1
 }
 
+function printf_std() {
+    echo -e "$1" 1>&2
+}
+
 #数据库相关
 function db_add_project() {
-    echo "a"
+    printf_std "a"
 }
 
 function db_query_project_type_all() {
@@ -57,6 +61,7 @@ function git_branch() {
     local token="wjUT7QBsL5vsL-ytGJUr"
     local gitlab_url="gitlab.dahantc.com"
     local project_id=$(db_query_property "git_id" $project_name)
+    printf_std "查询${project_name}的git分支，git_id为${project_id}"
     for i in $(seq 1 11); do
         local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | grep -Ev "master" | tr "\n" "," | sed 's/,$//g')
         echo "master",$branch_list
@@ -66,30 +71,37 @@ function git_branch() {
 #初始化构建
 function init_build() {
     #拉取最新构建mod
-    echo -e "haha" 1>&2
+    printf_std "拉取最新构建mod"
     mkdir -p $mod_git_base
     cd $mod_git_base
     git init
     git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git
     #恢复git本地仓库误删文件
+    printf_std "恢复git本地仓库误删文件"
     git ls-files -d | xargs echo -e | xargs git checkout --
     #清除git本地仓库新增文件
+    printf_std "清除git本地仓库新增文件"
     git checkout . && git clean -xdf
     #初始化构建目录
+    printf_std "初始化构建目录"
     #mod_helm_chart
+    printf_std "对比mod_helm_chart的md5"
     server_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
     server_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-server/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
     if [[ $server_mod_chart_md5_it_git != $server_mod_chart_md5 ]]; then
+        printf_std "更新qa124-project-ema80-mod-server"
         rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-server
         cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-server $mod_chart_prefix_path
     fi
     vue_mod_chart_md5_it_git=$(echo $(cd $mod_git_base/mod_chart/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
     vue_mod_chart_md5=$(echo $(cd $mod_chart_prefix_path/qa124-project-ema80-mod-vue/ && find . -type f -exec md5sum {} + | md5sum | cut -d" " -f1))
     if [[ $vue_mod_chart_md5_it_git != $vue_mod_chart_md5 ]]; then
+        printf_std "更新qa124-project-ema80-mod-vue"
         rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-vue
         cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-vue $mod_chart_prefix_path
     fi
     #清除上次构建镜像
+    printf_std "清除上次构建镜像"
     rm -rf $mod_docker_image_path
     cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server $mod_docker_image_prefix_path
 }
@@ -121,20 +133,26 @@ function prepare_for_docker_image() {
     local service_dir=$(db_query_property "service_dir" $complete_name)
     if [[ $(echo $service_type | grep "vue") != "" ]]; then
         #准备vue包
+        printf_std "准备vue包"
         cp -r "$vue_path/dist" "$mod_docker_image_path"
         #替换后端地址
+        printf_std "替换后端地址"
         local web_server_httpnodePort=$(db_query_property "service_httpnodePort" "${project_type}-${project_name}-web")
         echo -e "const baseUrl = 'http://172.18.1.190:$web_server_httpnodePort'\nwindow._BASE_URL = baseUrl;" >>$mod_docker_image_path/dist/config.js
         #准备dockerfile
+        printf_std "准备dockerfile"
         cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_vue $mod_docker_image_path/Dockerfile
         sed -i 's#{{service_port}}#$service_port#' $mod_docker_image_path/Dockerfile
         #准备conf
+        printf_std "准备conf"
         cp $mod_docker_image_path/mod_files/nginx/default.conf $mod_docker_image_path
         echo "$complete_name 镜像准备工作完成"
     else
         #准备jar包
+        printf_std "准备jar包"
         cp $jar_path/*.jar $mod_docker_image_path
         #准备dockerfile
+        printf_std "准备dockerfile"
         cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_server $mod_docker_image_path/Dockerfile
         sed -i "s#{{prefix_dir}}#$prefix_dir#g" $mod_docker_image_path/Dockerfile
         sed -i "s#{{service_type}}#$service_type#g" $mod_docker_image_path/Dockerfile
@@ -142,6 +160,7 @@ function prepare_for_docker_image() {
         sed -i "s#{{service_port}}#$service_port#g" $mod_docker_image_path/Dockerfile
         sed -i "s#{{debug_port}}#$service_port#g" $mod_docker_image_path/Dockerfile
         #docker_start.sh
+        printf_std "准备docker_start.sh"
         cp $mod_docker_image_path/mod_files/docker_start.sh $mod_docker_image_path
         sed -i "s#{{prefix_dir}}#$prefix_dir#g" $mod_docker_image_path/docker_start.sh
         sed -i "s#{{service_dir}}#$service_dir#g" $mod_docker_image_path/docker_start.sh
@@ -150,7 +169,7 @@ function prepare_for_docker_image() {
         sed -i "s#{{resource_name}}#$resource_name#g" $mod_docker_image_path/docker_start.sh
         sed -i "s#{{debug_port}}#$debug_port#g" $mod_docker_image_path/docker_start.sh
         sed -i "s#{{project_name}}#$project_name#g" $mod_docker_image_path/docker_start.sh
-        echo "$complete_name 镜像准备工作完成"
+        printf_std "$complete_name 镜像准备工作完成"
     fi
 }
 
@@ -173,6 +192,7 @@ function configure_helm_chart() {
     local debug_port=$(db_query_property "debug_port" $complete_name)
     local debug_httpnodePort=$(db_query_property "debug_httpnodePort" $complete_name)
     #修改values.yaml
+    printf_std "修改values.yaml"
     sed -i "s#qa124_ema80_mod_server#${app_name}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
     sed -i "s#service1_port#${service_port}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
     sed -i "s#service1_httpnodePort#${service_httpnodePort}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
@@ -181,8 +201,10 @@ function configure_helm_chart() {
         sed -i "s#service2_httpnodePort#${debug_httpnodePort}#g" ${mod_chart_prefix_path}/${app_name}/values.yaml
     fi
     #修改Chart.yaml
+    printf_std "修改Chart.yaml"
     sed -i "s#project_name#${app_name}#g" ${mod_chart_prefix_path}/${app_name}/Chart.yaml
     #配置/templates/statefulSet.yaml目录挂载
+    printf_std "配置/templates/statefulSet.yaml目录挂载"
     #nfs
     cat ${mod_chart_prefix_path}/${app_name}/templates/statefulSet.yaml
 }
@@ -196,7 +218,7 @@ function nacos() {
     local nacos_config_url="$nacos_url/dhst/v1/cs/configs"
     local nacos_accessToken=$(echo $(curl -s -X POST $nacos_auth_url -d 'username=dahantc&password=dahantc') | jq '.accessToken' | sed 's/\"//g')
     #检查namespace
-    echo "检查${project_name}的nacos配置"
+    printf_std "检查${project_name}的nacos配置"
     local nacos_namespaces=$(echo $(curl -s -X GET $nacos_namespace_url))
     local namespace_quantity=$(echo $nacos_namespaces | jq '.data | length')
     local isNamespaceExist=false
@@ -209,9 +231,9 @@ function nacos() {
     done
     #创建namespace
     if [[ $isNamespaceExist == true ]]; then
-        echo "${project_name}的nacos配置已存在"
+        printf_std "${project_name}的nacos配置已存在"
     else
-        echo "创建${project_name}的nacos配置"
+        printf_std "创建${project_name}的nacos配置"
         local tenant_id=$(date | md5sum | cut -d" " -f1)
         curl -s -X POST "${nacos_namespace_url}customNamespaceId=${tenant_id}&namespaceName=${project_name}&namespaceDesc=&accessToken=${nacos_accessToken}"
         #创建应用配置文件
@@ -240,7 +262,7 @@ function nacos() {
         content=$(cat $mod_docker_image_path/config/nacos/ctc-5gucp-app.properties)
         curl -s -X POST -H "multipart/form-data" -d'tenant='"${tenant_id}"'&dataId=ctc-5gucp-app&group=APP_GROUP&type=Properties&accessToken='"${nacos_accessToken}"'' --data-urlencode 'content='"${content}"'' $nacos_config_url
         # #创建nacos配置文件
-        echo "创建${project_name}的nacos注册配置"
+        printf_std "创建${project_name}的nacos注册配置"
         mkdir -p $mod_docker_image_path/config/{web,app}/
         cp $mod_docker_image_path/mod_files/configs_in_docker/5gucp/web/* $mod_docker_image_path/config/web/
         cp $mod_docker_image_path/mod_files/configs_in_docker/5gucp/app/* $mod_docker_image_path/config/app/
