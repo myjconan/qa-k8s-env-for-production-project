@@ -12,7 +12,8 @@
 // git_branch
 //----------------------------------------------------------------------------------------
 //自定义参数
-def build_script="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/jenkinsfile/qa-k8s-env-for-production-project.sh"
+def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base"
+def build_script="${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh"
 def harbor_url="172.18.1.157"
 def mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
@@ -44,6 +45,7 @@ pipeline {
         stage('初始化构建') {
             steps{
 				script{
+                    sh "mkdir -p ${mod_git_base}"
                     sh "bash ${build_script} init_build"
                 }            
             }
