@@ -7,7 +7,7 @@
 // JOB_NAME
 // project_type=ema8
 // project_name=beidou
-// server_type=vue,web,app
+// service_type=vue,web,app
 // git_path=gitlab……
 // git_branch
 //----------------------------------------------------------------------------------------
@@ -16,15 +16,15 @@ def build_script="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_g
 def harbor_url="172.18.1.157"
 def mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
-def complete_name="${project_type}-${project_name}-${server_type}"
+def complete_name="${project_type}-${project_name}-${service_type}"
 def app_name
-if( "${server_type}" != "vue" ){
+if( "${service_type}" != "vue" ){
     // qa124-beidou-ema8-web-server
-    app_name="qa124-$project_name-$project_type-$server_type-server"
+    app_name="qa124-$project_name-$project_type-$service_type-server"
     chart_mod="qa124-project-ema80-mod-server"
 }else{
     // qa124-leapauto-5gucp-web-vue
-    app_name="qa124-$project_name-$project_type-web-$server_type"
+    app_name="qa124-$project_name-$project_type-web-$service_type"
     chart_mod="qa124-project-ema80-mod-vue"
 }
 
@@ -60,7 +60,7 @@ pipeline {
         stage('源码构建'){
             steps{
                 script{
-                    if( "${server_type}" == "vue" ){
+                    if( "${service_type}" == "vue" ){
                         echo "npm构建"
                         sh "npm i && npm run build:test"
                     } else {
