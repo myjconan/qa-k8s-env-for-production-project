@@ -4,8 +4,7 @@ mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_b
 #数据库
 project_database="$mod_git_base/database/qa-k8s-env-for-production-project-database.csv"
 #构建目录
-jar_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/target"
-vue_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/"
+project_jenkins_work_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/"
 mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-project-mod-server/"
@@ -110,6 +109,7 @@ function init_build() {
     printf_std "清除上次构建镜像"
     rm -rf $mod_docker_image_path
     cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server $mod_docker_image_prefix_path
+    rm -rf $project_jenkins_work_path/.git
 }
 
 #准备镜像
@@ -140,7 +140,7 @@ function prepare_for_docker_image() {
     if [[ $(echo $service_type | grep "vue") != "" ]]; then
         #准备vue包
         printf_std "准备vue包"
-        cp -r "$vue_path/dist" "$mod_docker_image_path"
+        cp -r "$project_jenkins_work_path/dist" "$mod_docker_image_path"
         #替换后端地址
         printf_std "替换后端地址"
         local web_server_httpnodePort=$(db_query_property "service_httpnodePort" "${project_type}-${project_name}-web")
@@ -156,7 +156,7 @@ function prepare_for_docker_image() {
     else
         #准备jar包
         printf_std "准备jar包"
-        cp $jar_path/*.jar $mod_docker_image_path
+        cp $project_jenkins_work_path/target/*.jar $mod_docker_image_path
         #准备dockerfile
         printf_std "准备dockerfile"
         cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_server $mod_docker_image_path/Dockerfile
