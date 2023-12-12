@@ -33,6 +33,6 @@ ema8-beijingmobile-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/projec
 ema8-beijingmobile-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,beijingmobile,/ema8/beijingmobile/,8181,31880,11028,31881,qa_ema8_beijingmobile
 ema8-test2-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,test2,/ema8/test2/,8081,31882,11028,31883,qa_ema8_test2
 ema8-test2-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,test2,/ema8/test2/,8181,31884,11028,31885,qa_ema8_test2
-5gucp-test6gucp-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,test6gucp,/ema8/test6gucp/,80,31886,-1,-1,qa_5gucp_test6gucp
-5gucp-test6gucp-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,test6gucp,/ema8/test6gucp/,8081,31887,11028,31888,qa_5gucp_test6gucp
-5gucp-test6gucp-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,test6gucp,/ema8/test6gucp/,8181,31889,11028,31890,qa_5gucp_test6gucp
+5gucp-test7gucp-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,test7gucp,/ema8/test7gucp/,80,31886,-1,-1,qa_5gucp_test7gucp
+5gucp-test7gucp-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,test7gucp,/ema8/test7gucp/,8081,31887,11028,31888,qa_5gucp_test7gucp
+5gucp-test7gucp-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,test7gucp,/ema8/test7gucp/,8181,31889,11028,31890,qa_5gucp_test7gucp
