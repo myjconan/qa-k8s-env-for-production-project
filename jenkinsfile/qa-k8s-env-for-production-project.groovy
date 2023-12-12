@@ -137,6 +137,7 @@ pipeline {
                             sh "bash ${build_script} ema8_config ${project_name}"
                         }
                         
+                    }
                 }
             }
         }
