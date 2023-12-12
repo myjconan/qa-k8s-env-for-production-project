@@ -28,7 +28,7 @@ function db_query_project_type_all() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询project_type_all" >>$mod_git_base/jenkinsfile/log.log
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u | xargs | sed 's/[ ][ ]*/,/g' | sed 's/$/,/')
+    echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u | xargs | sed 's/[ ][ ]*/,/g' | sed 's/$/,/') #结尾添加分隔符解决jenkins插件active choice返回列表的最后一项无法传递参数的bug
 }
 
 function db_query_stripped_project_name_in_project_type() {

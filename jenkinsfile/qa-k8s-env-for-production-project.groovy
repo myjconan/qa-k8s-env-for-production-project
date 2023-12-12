@@ -45,6 +45,7 @@ pipeline {
         stage('初始化构建') {
             steps{
 				script{
+                    echo "创建mod_git_base目录"
                     sh "mkdir -p ${mod_git_base}"
                     sh "bash ${build_script} init_build"
                 }            
