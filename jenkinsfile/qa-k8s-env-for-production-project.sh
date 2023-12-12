@@ -242,6 +242,7 @@ function configure_helm_chart() {
 function nacos() {
     local project_name=${1:-1}
     local nacos_url=$property['nacos_url']
+    echo $nacos_url
     local nacos_auth_url="$nacos_url/dhst/v1/auth/login"
     local nacos_namespace_url="$nacos_url/dhst/v1/console/namespaces?"
     local nacos_config_url="$nacos_url/dhst/v1/cs/configs"
