@@ -59,6 +59,7 @@ function db_query_property() {
 #获取git分支
 function git_branch() {
     local project_name=${1:-1}
+    echo -e "$project_name" >>$mod_git_base/jenkinsfile/log.log
     local token="wjUT7QBsL5vsL-ytGJUr"
     local gitlab_url="gitlab.dahantc.com"
     local project_id=$(db_query_property "git_id" $project_name)
