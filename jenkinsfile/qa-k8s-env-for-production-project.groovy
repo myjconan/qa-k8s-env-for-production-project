@@ -123,7 +123,7 @@ pipeline {
             }
         }
 
-        stage('新项目部署nacos与应用配置文件'){
+        stage('新项目配置'){
             steps{
                 script{
                     is_new_project=sh(
