@@ -1,6 +1,6 @@
 #检查挂载目录
 project_mount_dir="/{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/"
-if [ -d "$project_mount_dir" == "0" ]; then
+if [ ! -d "$project_mount_dir" ]; then
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/logs
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/config
@@ -18,7 +18,6 @@ ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource /{{prefix_
 ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/logs /{{prefix_dir}}/{{service_dir}}/{{service_type}}/logs
 ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/config /{{prefix_dir}}/{{service_dir}}/{{service_type}}/config
 # 修改应用ip为本机
-
 app_proper_files=$(cd /{{prefix_dir}}/{{service_dir}}/{{service_type}}/config/ && ls application.properties 2>/dev/null | wc -l)
 if [ "$app_proper_files" != "0" ]; then
     export docker_ip=$(tail -n 1 /etc/hosts | awk '{print $1}')
