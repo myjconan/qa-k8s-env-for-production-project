@@ -39,6 +39,7 @@ pipeline {
                 echo "构建应用名称：${app_name}"
                 echo "git路径：${git_path}"
                 echo "git分支：${git_branch}"
+                echo "git分支：${branch_rev}"
             }
         }
 
