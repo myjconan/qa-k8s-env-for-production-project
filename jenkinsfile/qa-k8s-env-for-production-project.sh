@@ -25,7 +25,7 @@ function db_add_project() {
 }
 
 function db_query_project_type_all() {
-    echo -e "date 查询project_type_all" >>$mod_git_base/jenkinsfile/log.log
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询project_type_all" >>$mod_git_base/jenkinsfile/log.log
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
     echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u | xargs | sed 's/[ ][ ]*/,/g' | sed 's/$/,/')
@@ -33,7 +33,7 @@ function db_query_project_type_all() {
 
 function db_query_stripped_project_name_in_project_type() {
     local project_type=${1:-1}
-    echo -e "查询stripped_project_name：$project_type" >>$mod_git_base/jenkinsfile/log.log
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询stripped_project_name：$project_type" >>$mod_git_base/jenkinsfile/log.log
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
     echo $(awk -v FS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_type | cut -d '-' -f2 | sort -u | xargs | sed 's/[ ][ ]*/,/g' | sed 's/$/,/')
@@ -42,7 +42,7 @@ function db_query_stripped_project_name_in_project_type() {
 function db_query_service_type_in_project() {
     local project_type=${1:-1}
     local project_name=${2:-1}
-    echo -e "查询service_type：$project_type,$project_name" >>$mod_git_base/jenkinsfile/log.log
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询service_type：$project_type,$project_name" >>$mod_git_base/jenkinsfile/log.log
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
     echo $(awk -v FS="," -v col_num=$col_num 'NR>1{print $col_num}' $project_database | grep $project_name | grep $project_type | cut -d '-' -f3 | sort -u | xargs | sed 's/[ ][ ]*/,/g' | sed 's/$/,/')
@@ -51,7 +51,7 @@ function db_query_service_type_in_project() {
 function db_query_property() {
     local col_name=${1:-1}
     local project_name=${2:-1}
-    echo -e "查询property：$col_name,$project_name" >>$mod_git_base/jenkinsfile/log.log
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询property：$col_name,$project_name" >>$mod_git_base/jenkinsfile/log.log
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
     if [[ $col_num == "" ]]; then
         error_exit "bad query variable:\ncol_name:$col_name\nproject_name:$project_name"
@@ -63,7 +63,7 @@ function db_query_property() {
 #获取git分支
 function git_branch() {
     local project_name=${1:-1}
-    echo -e "查询git分支：$project_name" >>$mod_git_base/jenkinsfile/log.log
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询git_branch：$project_name" >>$mod_git_base/jenkinsfile/log.log
     local token="wjUT7QBsL5vsL-ytGJUr"
     local gitlab_url="gitlab.dahantc.com"
     local project_id=$(db_query_property "git_id" $project_name)
