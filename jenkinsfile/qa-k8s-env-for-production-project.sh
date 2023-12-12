@@ -11,12 +11,12 @@ mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-project-mod-server/"
 
 function error_exit() {
-    echo -e "$1" 1>&2
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') $1" 1>&2
     exit 1
 }
 
 function printf_std() {
-    echo -e "$1" 1>&2
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') $1" 1>&2
 }
 
 #数据库相关
