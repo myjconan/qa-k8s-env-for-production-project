@@ -112,8 +112,9 @@ function init_build() {
     fi
     #清除上次构建镜像
     printf_std "清除上次构建镜像"
+    mkdir -p $mod_docker_image_path
     rm -rf $mod_docker_image_path
-    cp -r $mod_docker_image_path $mod_docker_image_prefix_path
+    cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server/ $mod_docker_image_prefix_path
     mkdir -p $mod_docker_image_path/config/
 }
 
