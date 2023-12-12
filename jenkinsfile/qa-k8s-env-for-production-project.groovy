@@ -38,7 +38,7 @@ pipeline {
                 //自定义
                 echo "构建应用名称：${app_name}"
                 echo "git路径：${git_path}"
-                echo "git分支：${git_branch}"
+                echo "git分支：${git_branch_test}"
                 echo "git分支：${branch_rev}"
             }
         }
@@ -49,7 +49,7 @@ pipeline {
                     echo "创建mod_git_base目录"
                     sh "mkdir -p ${mod_git_base}"
                     sh "bash ${build_script} init_build"
-                    echo "${git_branch}"
+                    echo "${git_branch_test}"
                 }            
             }
         }
@@ -58,8 +58,8 @@ pipeline {
             steps{
 				script{
                     echo "拉取应用git源码"
-                    echo "${git_branch}"
-					git branch: "${git_branch}", url: "git@${git_path}"
+                    echo "${git_branch_test}"
+					git branch: "${git_branch_test}", url: "git@${git_path}"
                 }            
             }
         }
