@@ -19,6 +19,7 @@ def mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 def complete_name="${project_type}-${project_name}-${service_type}"
 def app_name
+def chart_mod
 if( "${service_type}" != "vue" ){
     // qa124-beidou-ema8-web-server
     app_name="qa124-$project_name-$project_type-$service_type-server"
@@ -86,7 +87,7 @@ pipeline {
         stage('构建镜像'){
             steps{
 				script{
-					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_prefix_path}"
+					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_prefix_path}/${chart_mod}/"
 				}
             }
         }

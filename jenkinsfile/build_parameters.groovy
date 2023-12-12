@@ -10,7 +10,7 @@ return alist;
 
 
 //project_name
-//请选择项目名称，如未收录，请联系运维人员添加！！！
+//请选择项目名称，如未收录，请联系运维人员添加！！！可在下方筛选器中快速搜索。
 //Active Choices Reactive Parameter
 //project_type
 def list=" bash  /var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/jenkinsfile/qa-k8s-env-for-production-project.sh db_query_stripped_project_name_in_project_type ${project_type}".execute().in.text;
@@ -35,8 +35,8 @@ return alist;
 //project_type,project_name,service_type
 return [" bash  /var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/jenkinsfile/qa-k8s-env-for-production-project.sh db_query_property git_path ${project_type}-${project_name}-${service_type}".execute().in.text]
 
-//git_branch
-//请耐心等待几秒后选择！！！
+// branch_for_git # git_branch为git插件系统变量，不能使用
+//请耐心等待几秒后选择！！！可在下方筛选器中快速搜索。
 //Active Choices Reactive Parameter
 //project_type,project_name,service_type
 def list=" bash  /var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/jenkinsfile/qa-k8s-env-for-production-project.sh git_branch ${project_type}-${project_name}-${service_type}".execute().in.text;
