@@ -11,12 +11,13 @@
 // git_path=gitlab……
 // branch_for_git # git_branch为git插件系统变量，不能使用
 //----------------------------------------------------------------------------------------
+//公司参数
+def harbor_url="172.18.1.157"
+def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 //自定义参数
 def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base"
 def build_script="${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh"
-def harbor_url="172.18.1.157"
-def mod_docker_image_prefix_path="/home/k8s/build/project_image/"
-def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
+def mod_docker_image_path="/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server/"
 def complete_name="${project_type}-${project_name}-${service_type}"
 def app_name
 def chart_mod
@@ -87,7 +88,7 @@ pipeline {
         stage('构建镜像'){
             steps{
 				script{
-					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_prefix_path}/${chart_mod}/"
+					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
 				}
             }
         }
