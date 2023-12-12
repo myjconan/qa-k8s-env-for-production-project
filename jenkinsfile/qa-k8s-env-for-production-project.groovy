@@ -9,7 +9,7 @@
 // project_name=beidou
 // service_type=vue,web,app
 // git_path=gitlab……
-// git_branch
+// branch_for_git # git_branch为git插件系统变量，不能使用
 //----------------------------------------------------------------------------------------
 //自定义参数
 def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base"
@@ -38,8 +38,7 @@ pipeline {
                 //自定义
                 echo "构建应用名称：${app_name}"
                 echo "git路径：${git_path}"
-                echo "git分支：${git_branch_test}"
-                echo "git分支：${branch_rev}"
+                echo "git分支：${branch_for_git}"
             }
         }
 
@@ -49,7 +48,6 @@ pipeline {
                     echo "创建mod_git_base目录"
                     sh "mkdir -p ${mod_git_base}"
                     sh "bash ${build_script} init_build"
-                    echo "${git_branch_test}"
                 }            
             }
         }
@@ -58,8 +56,7 @@ pipeline {
             steps{
 				script{
                     echo "拉取应用git源码"
-                    echo "${git_branch_test}"
-					git branch: "${git_branch_test}", url: "git@${git_path}"
+					git branch: "${branch_for_git}", url: "git@${git_path}"
                 }            
             }
         }
