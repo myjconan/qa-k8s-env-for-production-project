@@ -1,4 +1,4 @@
-#检查挂载目录
+#检查是否新项目
 project_mount_dir="/{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/"
 if [ ! -d "$project_mount_dir" ]; then
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource
