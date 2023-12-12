@@ -31,5 +31,5 @@ ema8-volvo-app,1301,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-app-v
 5gucp-proddeptqaenv-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,proddeptqaenv,/ema8/proddeptqaenv/,8181,31871,11028,31872,qa_5gucp_proddeptqaenv
 ema8-beijingmobile-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,beijingmobile,/ema8/beijingmobile/,8081,31878,11028,31879,qa_ema8_beijingmobile
 ema8-beijingmobile-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,beijingmobile,/ema8/beijingmobile/,8181,31880,11028,31881,qa_ema8_beijingmobile
-ema8-test-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,test,/ema8/test/,8081,31882,11028,31883,qa_ema8_test
-ema8-test-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,test,/ema8/test/,8181,31884,11028,31885,qa_ema8_test
+ema8-test1-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,test1,/ema8/test1/,8081,31882,11028,31883,qa_ema8_test1
+ema8-test1-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,test1,/ema8/test1/,8181,31884,11028,31885,qa_ema8_test1
