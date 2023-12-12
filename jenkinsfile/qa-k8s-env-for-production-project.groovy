@@ -123,6 +123,24 @@ pipeline {
             }
         }
 
+        stage('新项目部署nacos与应用配置文件'){
+            steps{
+                script{
+                    is_new_project=sh(
+                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${project_name}|wc -l",
+                        returnStdout: true
+                    ).trim()
+                    if( "${is_new_project}" == "0" ){
+                        if( "${project_type}" == "5gucp" ){
+                            sh "bash ${build_script} nacos ${project_name}"
+                        }else{
+                            sh "bash ${build_script} ema8_config ${project_name}"
+                        }
+                        
+                }
+            }
+        }
+
         stage('装载至k8s'){
             steps{
                 script{

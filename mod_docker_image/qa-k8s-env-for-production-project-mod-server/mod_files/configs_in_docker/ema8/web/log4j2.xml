@@ -2,7 +2,7 @@
 <!-- status=debug 可以查看log4j的装配过程 -->
 <configuration status="off" monitorInterval="60">
 	<properties>
-		<property name="LOG_HOME">/home/tong/ema8/mszq/web/logs</property>
+		<property name="LOG_HOME">{{log_path}}</property>
 		<!-- 日志备份目录 -->
 		<property name="LOG_NAME">web</property>
 		<property name="ENCODE">UTF-8</property>

@@ -8,6 +8,23 @@ project_jenkins_work_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-proj
 mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-project-mod-server/"
+# 中间件连接信息
+declare -A property
+#database
+property['db_address']="172.18.1.190:30336"
+property['db_root_password']="123456"
+#redis
+property['redis_host']="172.18.1.190"
+property['redis_port']="31873"
+property['redis_password']="test"
+#minio
+property['minio_api_url']="http://172.18.1.190:31874"
+property['minio_accessKey']="admin"
+property['minio_secretKey']="root123456"
+#nacos
+property['nacos_url']="http://172.18.9.190:31876"
+property['nacos_username']="dahantc"
+property['nacos_password']="dahantc"
 
 function error_exit() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') $1" 1>&2
@@ -224,7 +241,7 @@ function configure_helm_chart() {
 #配置nacos
 function nacos() {
     local project_name=${1:-1}
-    local nacos_url="http://172.18.9.190:31876"
+    local nacos_url=$property['nacos_url']
     local nacos_auth_url="$nacos_url/dhst/v1/auth/login"
     local nacos_namespace_url="$nacos_url/dhst/v1/console/namespaces?"
     local nacos_config_url="$nacos_url/dhst/v1/cs/configs"
@@ -249,20 +266,18 @@ function nacos() {
         local tenant_id=$(date | md5sum | cut -d" " -f1)
         curl -s -X POST "${nacos_namespace_url}customNamespaceId=${tenant_id}&namespaceName=${project_name}&namespaceDesc=&accessToken=${nacos_accessToken}"
         #创建应用配置文件
-        local -A property
-        property['db_url']="172.18.1.190:30336/qa_5gucp_${project_name}"
-        property['db_username']="qa_5gucp_${project_name}"
-        property['db_password']="qa_5gucp_${project_name}"
-        property['redis_address']="redis://172.18.1.190:31873"
-        property['redis_password']="test"
-        property['minio_api_url']="http://172.18.1.190:31874"
-        property['minio_accessKey']="admin"
-        property['minio_secretKey']="root123456"
+        local -A db_property
+        db_property['db_url']="${property['db_address']}/qa_5gucp_${project_name}"
+        db_property['db_username']="qa_5gucp_${project_name}"
+        db_property['db_password']="qa_5gucp_${project_name}"
         #web
         mkdir -p $mod_docker_image_path/config/nacos/
         cp $mod_docker_image_path/mod_files/nacos/ctc-5gucp-web-mod $mod_docker_image_path/config/nacos/ctc-5gucp-web.properties
         for key in $(echo ${!property[*]}); do
             sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/config/nacos/ctc-5gucp-web.properties"
+        done
+        for key in $(echo ${!db_property[*]}); do
+            sed -i "s#{{$key}}#${db_property[$key]}#g" "$mod_docker_image_path/config/nacos/ctc-5gucp-web.properties"
         done
         local content=$(cat $mod_docker_image_path/config/nacos/ctc-5gucp-web.properties)
         curl -s -X POST -H "multipart/form-data" -d'tenant='"${tenant_id}"'&dataId=ctc-5gucp-web&group=WEB_GROUP&type=Properties&accessToken='"${nacos_accessToken}"'' --data-urlencode 'content='"${content}"'' $nacos_config_url
@@ -270,6 +285,9 @@ function nacos() {
         cp $mod_docker_image_path/mod_files/nacos/ctc-5gucp-app-mod $mod_docker_image_path/config/nacos/ctc-5gucp-app.properties
         for key in $(echo ${!property[*]}); do
             sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/config/nacos/ctc-5gucp-app.properties"
+        done
+        for key in $(echo ${!db_property[*]}); do
+            sed -i "s#{{$key}}#${db_property[$key]}#g" "$mod_docker_image_path/config/nacos/ctc-5gucp-app.properties"
         done
         content=$(cat $mod_docker_image_path/config/nacos/ctc-5gucp-app.properties)
         curl -s -X POST -H "multipart/form-data" -d'tenant='"${tenant_id}"'&dataId=ctc-5gucp-app&group=APP_GROUP&type=Properties&accessToken='"${nacos_accessToken}"'' --data-urlencode 'content='"${content}"'' $nacos_config_url
@@ -282,7 +300,40 @@ function nacos() {
         sed -i "s#{{nacos_namespace}}#$tenant_id#g" "$mod_docker_image_path/config/web/bootstrap.properties"
         sed -i "s#{{nacos_server}}#$nacos_url#g" "$mod_docker_image_path/config/app/bootstrap.properties"
         sed -i "s#{{nacos_namespace}}#$tenant_id#g" "$mod_docker_image_path/config/app/bootstrap.properties"
+        for key in $(echo ${!property[*]}); do
+            sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/config/app/bootstrap.properties"
+        done
+        for key in $(echo ${!property[*]}); do
+            sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/config/web/bootstrap.properties"
+        done
     fi
+}
+
+function ema8_config() {
+    local project_name=${1:-1}
+    # #创建配置文件
+    printf_std "创建${project_name}的应用配置"
+    #创建应用配置文件
+    local -A db_property
+    db_property['db_url']="${property['db_address']}/qa_ema8_${project_name}"
+    db_property['db_username']="qa_ema8_${project_name}"
+    db_property['db_password']="qa_ema8_${project_name}"
+    mkdir -p $mod_docker_image_path/config/{web,app}/
+    cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/web/* $mod_docker_image_path/config/web/
+    cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/app/* $mod_docker_image_path/config/app/
+    for key in $(echo ${!property[*]}); do
+        sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/config/web/application.properties"
+    done
+    for key in $(echo ${!property[*]}); do
+        sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/config/app/application.properties"
+    done
+    for key in $(echo ${!db_property[*]}); do
+        sed -i "s#{{$key}}#${db_property[$key]}#g" "$mod_docker_image_path/config/web/application.properties"
+    done
+    for key in $(echo ${!db_property[*]}); do
+        sed -i "s#{{$key}}#${db_property[$key]}#g" "$mod_docker_image_path/config/app/application.properties"
+    done
+
 }
 
 #函数调用备注
