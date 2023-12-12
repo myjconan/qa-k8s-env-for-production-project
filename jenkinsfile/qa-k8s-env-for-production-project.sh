@@ -27,7 +27,7 @@ function db_add_project() {
 function db_query_project_type_all() {
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
-    echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u | xargs | sed 's/[ ][ ]*/,/g')
+    echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u -r | xargs | sed 's/[ ][ ]*/,/g')
 }
 
 function db_query_stripped_project_name_in_project_type() {
