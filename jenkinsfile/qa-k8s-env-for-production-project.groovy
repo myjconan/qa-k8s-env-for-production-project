@@ -49,6 +49,7 @@ pipeline {
                     echo "创建mod_git_base目录"
                     sh "mkdir -p ${mod_git_base}"
                     sh "bash ${build_script} init_build"
+                    echo "${git_branch}"
                 }            
             }
         }
@@ -57,6 +58,7 @@ pipeline {
             steps{
 				script{
                     echo "拉取应用git源码"
+                    echo "${git_branch}"
 					git branch: "${git_branch}", url: "git@${git_path}"
                 }            
             }
