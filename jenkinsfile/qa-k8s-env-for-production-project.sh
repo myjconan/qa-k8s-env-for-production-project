@@ -138,35 +138,36 @@ function init_build() {
 #准备镜像
 function prepare_for_docker_image() {
     local complete_name=${1:-1}
-    local prefix_dir="/home/tong/"
-    local project_type=$(echo $complete_name | cut -d '-' -f1 | head -n 1)
-    local project_name=$(echo $complete_name | cut -d '-' -f2 | head -n 1)
-    local service_type=$(echo $complete_name | cut -d '-' -f3 | head -n 1)
-    local resource_name=$(db_query_property "resource_name" $complete_name)
-    local service_port=$(db_query_property "service_port" $complete_name)
-    if [[ $service_port == "-1" ]]; then
+    local -A docker_image_property
+    docker_image_property['prefix_dir']="/home/tong/"
+    docker_image_property['project_type']=$(echo $complete_name | cut -d '-' -f1 | head -n 1)
+    docker_image_property['project_name']=$(echo $complete_name | cut -d '-' -f2 | head -n 1)
+    docker_image_property['service_type']=$(echo $complete_name | cut -d '-' -f3 | head -n 1)
+    docker_image_property['resource_name']=$(db_query_property "resource_name" $complete_name)
+    docker_image_property['service_port']=$(db_query_property "service_port" $complete_name)
+    if [[ ${docker_image_property['service_port']} == "-1" ]]; then
         error_exit "wrong service_port"
     fi
-    local service_httpnodePort=$(db_query_property "service_httpnodePort" $complete_name)
-    if [[ $service_httpnodePort == "-1" ]]; then
+    docker_image_property['service_httpnodePort']=$(db_query_property "service_httpnodePort" $complete_name)
+    if [[ ${docker_image_property['service_httpnodePort']} == "-1" ]]; then
         error_exit "wrong service_httpnodePort"
     fi
-    local debug_port=$(db_query_property "debug_port" $complete_name)
-    if [[ $debug_port == "-1" ]] && [[ $service_type != "vue" ]]; then
+    docker_image_property['debug_port']=$(db_query_property "debug_port" $complete_name)
+    if [[ ${docker_image_property['debug_port']} == "-1" ]] && [[ ${docker_image_property['service_type']} != "vue" ]]; then
         error_exit "wrong debug_port"
     fi
-    local debug_httpnodePort=$(db_query_property "debug_httpnodePort" $complete_name)
-    if [[ $debug_httpnodePort == "-1" ]] && [[ $service_type != "vue" ]]; then
+    docker_image_property['debug_httpnodePort']=$(db_query_property "debug_httpnodePort" $complete_name)
+    if [[ $debug_httpnodePort == "-1" ]] && [[ ${docker_image_property['service_type']} != "vue" ]]; then
         error_exit "wrong debug_httpnodePort"
     fi
-    local service_dir=$(db_query_property "service_dir" $complete_name)
-    if [[ $(echo $service_type | grep "vue") != "" ]]; then
+    docker_image_property['service_dir']=$(db_query_property "service_dir" $complete_name)
+    if [[ $(echo ${docker_image_property['service_type']} | grep "vue") != "" ]]; then
         #准备vue包
         printf_std "准备vue包"
         cp -r "$project_jenkins_work_path/dist" "$mod_docker_image_path"
         #替换后端地址
         printf_std "替换后端地址"
-        local web_server_httpnodePort=$(db_query_property "service_httpnodePort" "${project_type}-${project_name}-web")
+        local web_server_httpnodePort=$(db_query_property "service_httpnodePort" "${docker_image_property['project_type']}-${docker_image_property['project_name']}-web")
         echo -e "const baseUrl = 'http://172.18.1.190:$web_server_httpnodePort'\nwindow._BASE_URL = baseUrl;" >>$mod_docker_image_path/dist/config.js
         #准备dockerfile
         printf_std "准备dockerfile"
@@ -183,21 +184,15 @@ function prepare_for_docker_image() {
         #准备dockerfile
         printf_std "准备dockerfile"
         cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_server $mod_docker_image_path/Dockerfile
-        sed -i "s#{{prefix_dir}}#$prefix_dir#g" $mod_docker_image_path/Dockerfile
-        sed -i "s#{{service_type}}#$service_type#g" $mod_docker_image_path/Dockerfile
-        sed -i "s#{{service_dir}}#$service_dir#g" $mod_docker_image_path/Dockerfile
-        sed -i "s#{{service_port}}#$service_port#g" $mod_docker_image_path/Dockerfile
-        sed -i "s#{{debug_port}}#$service_port#g" $mod_docker_image_path/Dockerfile
+        for key in $(echo ${!docker_image_property[*]}); do
+            sed -i "s#{{$key}}#${docker_image_property[$key]}#g" "$mod_docker_image_path/Dockerfile"
+        done
         #docker_start.sh
         printf_std "准备docker_start.sh"
         cp $mod_docker_image_path/mod_files/docker_start.sh $mod_docker_image_path
-        sed -i "s#{{prefix_dir}}#$prefix_dir#g" $mod_docker_image_path/docker_start.sh
-        sed -i "s#{{service_dir}}#$service_dir#g" $mod_docker_image_path/docker_start.sh
-        sed -i "s#{{service_type}}#$service_type#g" $mod_docker_image_path/docker_start.sh
-        sed -i "s#{{project_type}}#$project_type#g" $mod_docker_image_path/docker_start.sh
-        sed -i "s#{{resource_name}}#$resource_name#g" $mod_docker_image_path/docker_start.sh
-        sed -i "s#{{debug_port}}#$debug_port#g" $mod_docker_image_path/docker_start.sh
-        sed -i "s#{{project_name}}#$project_name#g" $mod_docker_image_path/docker_start.sh
+        for key in $(echo ${!docker_image_property[*]}); do
+            sed -i "s#{{$key}}#${docker_image_property[$key]}#g" "$mod_docker_image_path/docker_start.sh"
+        done
         printf_std "$complete_name 镜像准备工作完成"
     fi
 }
