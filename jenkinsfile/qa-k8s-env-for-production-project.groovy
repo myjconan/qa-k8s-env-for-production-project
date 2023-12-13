@@ -30,6 +30,10 @@ if( "${service_type}" != "vue" ){
     app_name="qa124-$project_name-$project_type-web-$service_type"
     chart_mod="qa124-project-ema80-mod-vue"
 }
+def is_new_project=sh(
+    script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
+    returnStdout: true
+).trim()
 
 pipeline {
     agent any
@@ -88,6 +92,7 @@ pipeline {
         stage('构建镜像'){
             steps{
 				script{
+                    sh "ls ${mod_docker_image_path}/config"
 					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
 				}
             }
@@ -126,10 +131,6 @@ pipeline {
         stage('新项目配置'){
             steps{
                 script{
-                    is_new_project=sh(
-                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${project_name}|wc -l",
-                        returnStdout: true
-                    ).trim()
                     if( "${is_new_project}" == "0" ){
                         if( "${project_type}" == "5gucp" ){
                             sh "bash ${build_script} nacos ${project_name}"
@@ -145,11 +146,7 @@ pipeline {
         stage('装载至k8s'){
             steps{
                 script{
-                    is_install=sh(
-                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
-                        returnStdout: true
-                    ).trim()
-                    if( "${is_install}" == "0" ){
+                    if( "${is_new_project}" == "0" ){
                         sh "/usr/bin/helm install ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }else{
                         sh "/usr/bin/helm upgrade ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
