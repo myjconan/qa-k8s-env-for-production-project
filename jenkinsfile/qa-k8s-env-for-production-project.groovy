@@ -12,23 +12,23 @@
 // branch_for_git # git_branch为git插件系统变量，不能使用
 //----------------------------------------------------------------------------------------
 //公司参数
-def harbor_url="172.18.1.157"
-def mod_chart_prefix_path="/home/k8s/chart/124-qa/"
+def harbor_url = '172.18.1.157'
+def mod_chart_prefix_path = '/home/k8s/chart/124-qa/'
 //自定义参数
-def mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base"
-def build_script="${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh"
-def mod_docker_image_path="/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server/"
-def complete_name="${project_type}-${project_name}-${service_type}"
+def mod_git_base = '/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base'
+def build_script = "${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh"
+def mod_docker_image_path = '/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server/'
+def complete_name = "${project_type}-${project_name}-${service_type}"
 def app_name
 def chart_mod
-if( "${service_type}" != "vue" ){
+if ("${service_type}" != 'vue') {
     // qa124-beidou-ema8-web-server
-    app_name="qa124-$project_name-$project_type-$service_type-server"
-    chart_mod="qa124-project-ema80-mod-server"
-}else{
+    app_name = "qa124-$project_name-$project_type-$service_type-server"
+    chart_mod = 'qa124-project-ema80-mod-server'
+} else {
     // qa124-leapauto-5gucp-web-vue
-    app_name="qa124-$project_name-$project_type-web-$service_type"
-    chart_mod="qa124-project-ema80-mod-vue"
+    app_name = "qa124-$project_name-$project_type-web-$service_type"
+    chart_mod = 'qa124-project-ema80-mod-vue'
 }
 
 pipeline {
@@ -45,110 +45,108 @@ pipeline {
         }
 
         stage('初始化构建') {
-            steps{
-				script{
-                    echo "创建mod_git_base目录"
+            steps {
+                script {
+                    echo '创建mod_git_base目录'
                     sh "mkdir -p ${mod_git_base}"
                     sh "bash ${build_script} init_build"
-                }            
+                }
             }
         }
 
         stage('拉取应用git源码') {
-            steps{
-				script{
-                    echo "拉取应用git源码"
-					git branch: "${branch_for_git}", url: "git@${git_path}"
-                }            
+            steps {
+                script {
+                    git branch: "${branch_for_git}", url: "git@${git_path}"
+                }
             }
         }
 
-        stage('源码构建'){
-            steps{
-                script{
-                    if( "${service_type}" == "vue" ){
-                        echo "npm构建"
-                        sh "npm i && npm run build:test"
+        stage('源码构建') {
+            steps {
+                script {
+                    if ("${service_type}" == 'vue') {
+                        echo 'npm构建'
+                        sh 'npm i && npm run build:test'
                     } else {
-                        echo "mvn构建"
-                        sh "mvn clean package"
+                        echo 'mvn构建'
+                        sh 'mvn clean package'
                     }
                 }
             }
         }
 
-        stage('准备镜像构建'){
-            steps{
-                script{
+        stage('应用配置') {
+            steps {
+                script {
+                    is_new_project = sh(
+                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
+                        returnStdout: true
+                    ).trim()
+                    if ("${is_new_project}" == '0') {
+                        if ("${project_type}" == '5gucp') {
+                            sh "bash ${build_script} nacos ${project_name}"
+                        } else {
+                            sh "bash ${build_script} ema8_config ${project_name}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('准备镜像构建') {
+            steps {
+                script {
                     sh "bash ${build_script} prepare_for_docker_image ${complete_name}"
                 }
             }
         }
 
-        stage('构建镜像'){
-            steps{
-				script{
-                    sh "cat ${mod_docker_image_path}/config/web/bootstrap.properties"
-					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
-				}
-            }
-        }
-
-        stage('镜像上传至harbor'){
-            steps{
-				script{
-                    sh " docker push '${harbor_url}/public/${app_name}:v1'"
-				}
-            }
-        }
-
-        stage('创建helm_chart'){
+        stage('构建镜像') {
             steps {
-                script{
-                    is_chart_exist=sh(
+                script {
+                    sh "cat ${mod_docker_image_path}/config/web/bootstrap.properties"
+                    sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
+                }
+            }
+        }
+
+        stage('镜像上传至harbor') {
+            steps {
+                script {
+                    sh " docker push '${harbor_url}/public/${app_name}:v1'"
+                }
+            }
+        }
+
+        stage('创建helm_chart') {
+            steps {
+                script {
+                    is_chart_exist = sh(
                         script: "cd ${mod_chart_prefix_path} && ls |grep ${app_name}|wc -l",
                         returnStdout: true
                     ).trim()
-                    if( "${is_chart_exist}" == "0" ){
+                    if ("${is_chart_exist}" == '0') {
                         sh "cp -r ${mod_chart_prefix_path}/${chart_mod}/ ${mod_chart_prefix_path}/${app_name}"
                     }
                 }
             }
         }
 
-        stage('配置helm_chart'){
+        stage('配置helm_chart') {
             steps {
-                script{
+                script {
                     sh "bash ${build_script} configure_helm_chart ${complete_name}"
                 }
             }
         }
 
-        stage('新项目配置'){
-            steps{
-                script{
-                    is_new_project=sh(
-                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
-                        returnStdout: true
-                    ).trim()
-                    if( "${is_new_project}" == "0" ){
-                        if( "${project_type}" == "5gucp" ){
-                            sh "bash ${build_script} nacos ${project_name}"
-                        }else{
-                            sh "bash ${build_script} ema8_config ${project_name}"
-                        }
-                        
-                    }
-                }
-            }
-        }
-
-        stage('装载至k8s'){
-            steps{
-                script{
-                    if( "${is_new_project}" == "0" ){
+        stage('装载至k8s') {
+            steps {
+                script {
+                    if ("${is_new_project}" == '0') {
                         sh "/usr/bin/helm install ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
-                    }else{
+                    } else {
                         sh "/usr/bin/helm upgrade ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     }
                 }
