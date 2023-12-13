@@ -79,16 +79,10 @@ pipeline {
         stage('应用配置') {
             steps {
                 script {
-                    is_new_project = sh(
-                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
-                        returnStdout: true
-                    ).trim()
-                    if ("${is_new_project}" == '0') {
-                        if ("${project_type}" == '5gucp') {
-                            sh "bash ${build_script} nacos ${project_name}"
-                        } else {
-                            sh "bash ${build_script} ema8_config ${project_name}"
-                        }
+                    if ("${project_type}" == '5gucp') {
+                        sh "bash ${build_script} nacos ${project_name}"
+                    } else {
+                        sh "bash ${build_script} ema8_config ${project_name}"
                     }
                 }
             }
@@ -144,7 +138,11 @@ pipeline {
         stage('装载至k8s') {
             steps {
                 script {
-                    if ("${is_new_project}" == '0') {
+                    is_installed = sh(
+                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
+                        returnStdout: true
+                    ).trim()
+                    if ("${is_installed}" == '0') {
                         sh "/usr/bin/helm install ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
                     } else {
                         sh "/usr/bin/helm upgrade ${app_name} ${mod_chart_prefix_path}/${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
