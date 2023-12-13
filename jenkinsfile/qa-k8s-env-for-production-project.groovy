@@ -99,7 +99,6 @@ pipeline {
         stage('构建镜像') {
             steps {
                 script {
-                    sh "cat ${mod_docker_image_path}/config/web/bootstrap.properties"
                     sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
                 }
             }
