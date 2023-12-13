@@ -88,7 +88,7 @@ pipeline {
         stage('构建镜像'){
             steps{
 				script{
-                    sh(script: "ls ${mod_docker_image_path}/config", returnStdout: true).trim()
+                    sh "cat ${mod_docker_image_path}/config/web/bootstrap.properties"
 					sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
 				}
             }
