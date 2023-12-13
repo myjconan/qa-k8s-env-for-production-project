@@ -10,8 +10,8 @@ if [ ! -d "$project_mount_dir" ]; then
     sed -i "s#{{log_path}}#/{{prefix_dir}}/{{service_dir}}/web/logs#g" /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/config/log4j2.xml
     sed -i "s#{{log_path}}#/{{prefix_dir}}/{{service_dir}}/app/logs#g" /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/config/log4j2.xml
     #创建数据库
-    rpm -ivh --nodeps /{{prefix_dir}}/mysql-community-client-8.2.0-1.el7.x86_64.rpm
-    /usr/bin/mysql -h 172.18.1.190 -P 30336 -u root -p123456 -s -e "CREATE DATABASE qa_{{project_type}}_{{project_name}} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;CREATE USER 'qa_{{project_type}}_{{project_name}}'@'%' IDENTIFIED BY 'qa_{{project_type}}_{{project_name}}';grant all privileges on qa_{{project_type}}_{{project_name}}.* to 'qa_{{project_type}}_{{project_name}}'@'%';flush privileges;"
+    rpm -ivh --nodeps /{{prefix_dir}}/*.rpm
+    /usr/bin/mysql -h {{db_host}} -P {{db_port}} -u root -p{{db_root_password}} -s -e "CREATE DATABASE qa_{{project_type}}_{{project_name}} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;CREATE USER 'qa_{{project_type}}_{{project_name}}'@'%' IDENTIFIED BY 'qa_{{project_type}}_{{project_name}}';grant all privileges on qa_{{project_type}}_{{project_name}}.* to 'qa_{{project_type}}_{{project_name}}'@'%';flush privileges;"
 fi
 # 创建挂载软连接
 ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource /{{prefix_dir}}/{{service_dir}}/resource
@@ -27,4 +27,4 @@ fi
 cd /{{prefix_dir}}/{{service_dir}}/{{service_type}}/
 jar -uvf0 *.jar BOOT-INF
 # 启动
-java -Xdebug -Xrunjdwp:transport=dt_socket,address={{debug_port}},server=y,suspend=n -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/{{prefix_dir}}/{{service_dir}}/{{service_type}}/logs -Djava.security.egd=file:/dev/urandom -Xbootclasspath/a:/{{prefix_dir}}/{{service_dir}}/{{service_type}}/config -Xms512m -Xmx2048m -jar /{{prefix_dir}}/{{service_dir}}/{{service_type}}/*.jar
+java -Xdebug -Xrunjdwp:transport=dt_socket,address={{debug_port}},server=y,suspend=n -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/{{prefix_dir}}/{{service_dir}}/{{service_type}}/logs -Djava.security.egd=file:/dev/urandom -Xbootclasspath/a:/{{prefix_dir}}/{{service_dir}}/{{service_type}}/config -Xms{{jvm_Xms}} -Xmx{{jvm_Xmx}} -jar /{{prefix_dir}}/{{service_dir}}/{{service_type}}/*.jar

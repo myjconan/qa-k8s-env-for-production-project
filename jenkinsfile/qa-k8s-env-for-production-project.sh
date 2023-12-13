@@ -1,7 +1,7 @@
 #! /bin/bash
 #git_base
 mod_git_base="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/"
-#数据库
+#数据库文件
 project_database="$mod_git_base/database/qa-k8s-env-for-production-project-database.csv"
 #构建目录
 project_jenkins_work_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/workspace/"
@@ -11,7 +11,8 @@ mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-p
 # 中间件连接信息
 declare -A property
 #database
-property['db_address']="172.18.1.190:30336"
+property['db_host']="172.18.1.190"
+property['db_port']="30336"
 property['db_root_password']="123456"
 #redis
 property['redis_host']="172.18.1.190"
@@ -25,6 +26,9 @@ property['minio_secretKey']="root123456"
 property['nacos_url']="http://172.18.9.190:31876"
 property['nacos_username']="dahantc"
 property['nacos_password']="dahantc"
+#jvm
+property['jvm_Xms']="512m"
+property['jvm_Xmx']="1400m"
 
 function error_exit() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') $1" 1>&2
@@ -37,7 +41,7 @@ function printf_std() {
 
 #数据库相关
 function db_add_project() {
-    printf_std "a"
+    printf_std "obligate"
 }
 
 function db_query_project_type_all() {
@@ -193,6 +197,9 @@ function prepare_for_docker_image() {
         for key in $(echo ${!docker_image_property[*]}); do
             sed -i "s#{{$key}}#${docker_image_property[$key]}#g" "$mod_docker_image_path/docker_start.sh"
         done
+        for key in $(echo ${!property[*]}); do
+            sed -i "s#{{$key}}#${property[$key]}#g" "$mod_docker_image_path/docker_start.sh"
+        done
         printf_std "$complete_name 镜像准备工作完成"
     fi
 }
@@ -262,7 +269,7 @@ function nacos() {
         curl -s -X POST "${nacos_namespace_url}customNamespaceId=${tenant_id}&namespaceName=${project_name}&namespaceDesc=&accessToken=${nacos_accessToken}"
         #创建应用配置文件
         local -A db_property
-        db_property['db_url']="${property['db_address']}/qa_5gucp_${project_name}"
+        db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_5gucp_${project_name}"
         db_property['db_username']="qa_5gucp_${project_name}"
         db_property['db_password']="qa_5gucp_${project_name}"
         #web
@@ -310,7 +317,7 @@ function ema8_config() {
     printf_std "创建${project_name}的应用配置"
     #创建应用配置文件
     local -A db_property
-    db_property['db_url']="${property['db_address']}/qa_ema8_${project_name}"
+    db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_ema8_${project_name}"
     db_property['db_username']="qa_ema8_${project_name}"
     db_property['db_password']="qa_ema8_${project_name}"
     mkdir -p $mod_docker_image_path/config/{web,app}/
