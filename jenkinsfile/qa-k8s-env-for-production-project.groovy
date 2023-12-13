@@ -30,10 +30,6 @@ if( "${service_type}" != "vue" ){
     app_name="qa124-$project_name-$project_type-web-$service_type"
     chart_mod="qa124-project-ema80-mod-vue"
 }
-def is_new_project=sh(
-    script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
-    returnStdout: true
-).trim()
 
 pipeline {
     agent any
@@ -131,6 +127,10 @@ pipeline {
         stage('新项目配置'){
             steps{
                 script{
+                    is_new_project=sh(
+                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
+                        returnStdout: true
+                    ).trim()
                     if( "${is_new_project}" == "0" ){
                         if( "${project_type}" == "5gucp" ){
                             sh "bash ${build_script} nacos ${project_name}"
