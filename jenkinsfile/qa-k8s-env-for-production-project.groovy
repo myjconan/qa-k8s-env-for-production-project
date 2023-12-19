@@ -49,6 +49,7 @@ pipeline {
                     ).trim()
                     if ("${is_installed}" == '1') {
                         sh "/usr/bin/helm uninstall ${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                        echo "${app_name}已卸载！"
                     } else {
                         echo "${app_name}未安装，无需卸载！"
                     }
