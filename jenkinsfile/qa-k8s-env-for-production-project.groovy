@@ -31,8 +31,8 @@ if ("${service_type}" != 'vue') {
     chart_mod = 'qa124-project-ema80-mod-vue'
 }
 def is_uninstall = false
-if (params.uninstall_app.toUpperCase() == "DELETE"){
-    is_uninstall=true
+if (params.uninstall_app.toUpperCase() == 'DELETE') {
+    is_uninstall = true
 }
 
 pipeline {
