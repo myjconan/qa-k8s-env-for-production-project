@@ -46,3 +46,7 @@ list.split(',').each {
     alist.add(it)
 }
 return alist
+
+// uninstall_app
+//如需卸载应用，请在下方输入delete！！！
+//字符参数
