@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     is_installed = sh(
-                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
+                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config | grep ${app_name} | wc -l",
                         returnStdout: true
                     ).trim()
                     if ("${is_installed}" == '0') {
