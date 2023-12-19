@@ -30,12 +30,33 @@ if ("${service_type}" != 'vue') {
     app_name = "qa124-$project_name-$project_type-web-$service_type"
     chart_mod = 'qa124-project-ema80-mod-vue'
 }
+def is_uninstall = false
+if (params.uninstall_app.toUpperCase() == "DELETE"){
+    is_uninstall=true
+}
 
 pipeline {
     agent any
 
     stages {
-        stage('打印参数') {
+        stage('卸载应用') {
+            when { expression { is_uninstall == true } }
+            steps {
+                script {
+                    is_installed = sh(
+                        script: "/usr/bin/helm list --namespace mod-5gucp --kubeconfig /home/k8s/config|grep ${app_name}|wc -l",
+                        returnStdout: true
+                    ).trim()
+                    if ("${is_installed}" == '0') {
+                        sh "/usr/bin/helm uninstall ${app_name} --namespace mod-5gucp --kubeconfig /home/k8s/config"
+                    } else {
+                        echo "${app_name}未安装，无需卸载！"
+                    }
+                }
+            }
+        }
+        stage('打印构建参数') {
+            when { expression { is_uninstall != true } }
             steps {
                 //自定义
                 echo "构建应用名称：${app_name}"
@@ -45,6 +66,7 @@ pipeline {
         }
 
         stage('初始化构建') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     echo '创建mod_git_base目录'
@@ -55,6 +77,7 @@ pipeline {
         }
 
         stage('拉取应用git源码') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     git branch: "${branch_for_git}", url: "git@${git_path}"
@@ -63,6 +86,7 @@ pipeline {
         }
 
         stage('源码构建') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     if ("${service_type}" == 'vue') {
@@ -77,6 +101,7 @@ pipeline {
         }
 
         stage('应用配置') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     if ("${project_type}" == '5gucp') {
@@ -89,6 +114,7 @@ pipeline {
         }
 
         stage('准备镜像构建') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     sh "bash ${build_script} prepare_for_docker_image ${complete_name}"
@@ -97,6 +123,7 @@ pipeline {
         }
 
         stage('构建镜像') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     sh "docker build -t '${harbor_url}/public/${app_name}:v1' ${mod_docker_image_path}/"
@@ -105,6 +132,7 @@ pipeline {
         }
 
         stage('镜像上传至harbor') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     sh " docker push '${harbor_url}/public/${app_name}:v1'"
@@ -113,6 +141,7 @@ pipeline {
         }
 
         stage('创建helm_chart') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     is_chart_exist = sh(
@@ -127,6 +156,7 @@ pipeline {
         }
 
         stage('配置helm_chart') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     sh "bash ${build_script} configure_helm_chart ${complete_name}"
@@ -135,6 +165,7 @@ pipeline {
         }
 
         stage('装载至k8s') {
+            when { expression { is_uninstall != true } }
             steps {
                 script {
                     is_installed = sh(
