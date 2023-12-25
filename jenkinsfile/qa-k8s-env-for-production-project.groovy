@@ -19,6 +19,13 @@ def mod_git_base = '/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod
 def build_script = "${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-project.sh"
 def mod_docker_image_path = '/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server/'
 def complete_name = "${project_type}-${project_name}-${service_type}"
+def true_project_type = 'ema8'
+if (${ project_type } == '5gucp') {
+    if (!('release/9.4' in "${branch_for_git}")) {
+        true_project_type = '5gucp'
+    }
+}
+
 def app_name
 def chart_mod
 if ("${service_type}" != 'vue') {
@@ -105,9 +112,8 @@ pipeline {
             when { expression { is_uninstall != true } }
             steps {
                 script {
-                    if ("${project_type}" == '5gucp') {
+                    if ("${true_project_type}" == '5gucp') {
                         sh "bash ${build_script} nacos ${project_name}"
-                        sh "bash ${build_script} ema8_config ${project_name}"
                     } else {
                         sh "bash ${build_script} ema8_config ${project_name}"
                     }
