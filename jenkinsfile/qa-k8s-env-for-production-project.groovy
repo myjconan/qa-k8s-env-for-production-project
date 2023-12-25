@@ -21,7 +21,7 @@ def mod_docker_image_path = '/home/k8s/build/project_image/qa-k8s-env-for-produc
 def complete_name = "${project_type}-${project_name}-${service_type}"
 def true_project_type = 'ema8'
 if ("${project_type}" == '5gucp') {
-    if (!('release/9.4' in "${branch_for_git}")) {
+    if (!(branch_for_git.contains('release/9'))) {
         true_project_type = '5gucp'
     }
 }
