@@ -20,7 +20,7 @@ def build_script = "${mod_git_base}/jenkinsfile/qa-k8s-env-for-production-projec
 def mod_docker_image_path = '/home/k8s/build/project_image/qa-k8s-env-for-production-project-mod-server/'
 def complete_name = "${project_type}-${project_name}-${service_type}"
 def true_project_type = 'ema8'
-if (${ project_type } == '5gucp') {
+if ("${project_type}" == '5gucp') {
     if (!('release/9.4' in "${branch_for_git}")) {
         true_project_type = '5gucp'
     }
