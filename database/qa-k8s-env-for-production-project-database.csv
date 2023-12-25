@@ -31,3 +31,5 @@ ema8-volvo-app,1301,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-app-v
 5gucp-proddeptqaenv-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,proddeptqaenv,/ema8/proddeptqaenv/,8181,31871,11028,31872
 ema8-beijingmobile-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,beijingmobile,/ema8/beijingmobile/,8081,31878,11028,31879
 ema8-beijingmobile-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,beijingmobile,/ema8/beijingmobile/,8181,31880,11028,31881
+5gucp-yanshi-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,yanshi,/ema8/yanshi/,8081,31827,11028,31828
+5gucp-yanshi-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,yanshi,/ema8/yanshi/,8181,31829,11028,31830
