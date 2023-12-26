@@ -115,7 +115,7 @@ pipeline {
                     if ("${true_project_type}" == '5gucp') {
                         sh "bash ${build_script} nacos ${project_name}"
                     } else {
-                        sh "bash ${build_script} ema8_config ${project_name}"
+                        sh "bash ${build_script} ema8_config ${project_name} ${project_type}"
                     }
                 }
             }

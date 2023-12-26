@@ -313,13 +313,14 @@ function nacos() {
 
 function ema8_config() {
     local project_name=${1:-1}
+    local project_type=${2:-1}
     # #创建配置文件
     printf_std "创建${project_name}的应用配置"
     #创建应用配置文件
     local -A db_property
-    db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_ema8_${project_name}"
-    db_property['db_username']="qa_ema8_${project_name}"
-    db_property['db_password']="qa_ema8_${project_name}"
+    db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_${project_type}_${project_name}"
+    db_property['db_username']="qa_${project_type}_${project_name}"
+    db_property['db_password']="qa_${project_type}_${project_name}"
     mkdir -p $mod_docker_image_path/config/{web,app}/
     cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/web/* $mod_docker_image_path/config/web/
     cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/app/* $mod_docker_image_path/config/app/
