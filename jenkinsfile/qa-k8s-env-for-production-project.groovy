@@ -21,7 +21,9 @@ def mod_docker_image_path = '/home/k8s/build/project_image/qa-k8s-env-for-produc
 def complete_name = "${project_type}-${project_name}-${service_type}"
 def true_project_type = 'ema8'
 if ("${project_type}" == '5gucp') {
-    if (!(branch_for_git.contains('release/9'))) {
+    if (branch_for_git.contains('release/9')) {
+        true_project_type = 'ema9'
+    }else {
         true_project_type = '5gucp'
     }
 }
@@ -115,7 +117,7 @@ pipeline {
                     if ("${true_project_type}" == '5gucp') {
                         sh "bash ${build_script} nacos ${project_name}"
                     } else {
-                        sh "bash ${build_script} ema8_config ${project_name} ${project_type}"
+                        sh "bash ${build_script} ema8_config ${project_name} ${project_type} ${true_project_type}"
                     }
                 }
             }

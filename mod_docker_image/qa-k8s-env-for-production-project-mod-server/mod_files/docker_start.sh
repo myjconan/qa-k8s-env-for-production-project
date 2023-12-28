@@ -4,6 +4,8 @@ if [ ! -d "$project_mount_dir" ]; then
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{web,app}/logs
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{web,app}/config
+    #创建资源文件
+    cp -r /{{prefix_dir}}/config/resource/* /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource/
     #创建配置文件
     cp /{{prefix_dir}}/config/web/* /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/config
     cp /{{prefix_dir}}/config/app/* /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/config

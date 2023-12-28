@@ -269,6 +269,7 @@ function nacos() {
         curl -s -X POST "${nacos_namespace_url}customNamespaceId=${tenant_id}&namespaceName=${project_name}&namespaceDesc=&accessToken=${nacos_accessToken}"
         #创建应用配置文件
         local -A db_property
+        db_property['hibernate_dialect']="com.dahantc.ema.common.dialect.GroupMySQLDialect"
         db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_5gucp_${project_name}"
         db_property['db_username']="qa_5gucp_${project_name}"
         db_property['db_password']="qa_5gucp_${project_name}"
@@ -314,14 +315,20 @@ function nacos() {
 function ema8_config() {
     local project_name=${1:-1}
     local project_type=${2:-1}
+    local true_project_type=${3:-1}
     # #创建配置文件
     printf_std "创建${project_name}的应用配置"
     #创建应用配置文件
     local -A db_property
+    case "$true_project_type" in
+    "ema8") db_property['hibernate_dialect']="org.hibernate.dialect.MySQL55Dialect" ;;
+    "ema9") db_property['hibernate_dialect']="com.dahantc.ema.common.dialect.GroupMySQLDialect" ;;
+    esac
     db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_${project_type}_${project_name}"
     db_property['db_username']="qa_${project_type}_${project_name}"
     db_property['db_password']="qa_${project_type}_${project_name}"
     mkdir -p $mod_docker_image_path/config/{web,app}/
+    cp -r $mod_docker_image_path/mod_files/resource $mod_docker_image_path/config/
     cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/web/* $mod_docker_image_path/config/web/
     cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/app/* $mod_docker_image_path/config/app/
     for key in $(echo ${!property[*]}); do
