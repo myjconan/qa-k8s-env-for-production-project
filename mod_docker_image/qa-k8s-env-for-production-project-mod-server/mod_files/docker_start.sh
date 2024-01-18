@@ -22,7 +22,7 @@ ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/co
 # 修改应用ip为本机
 app_proper_files=$(cd /{{prefix_dir}}/{{service_dir}}/{{service_type}}/config/ && ls application.properties 2>/dev/null | wc -l)
 if [ "$app_proper_files" != "0" ]; then
-    export docker_ip=$(tail -n 1 /etc/hosts | awk '{print $1}')
+    export docker_ip=$(cat /etc/hosts | grep "qa124-{{project_name}}-{{project_type}}" | awk -F " " '{print $1}')
     sed -r -i "s/(AppDeployIp=).*/\1$docker_ip/" /{{prefix_dir}}/{{service_dir}}/{{service_type}}/config/application.properties
 fi
 # 替换license
