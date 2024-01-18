@@ -170,7 +170,7 @@ utry.publicStorePath=/license/publicCerts.keystore
 oss.type=MINIO
 # minio相关配置
 #minio服务器地址
-minio.endpoint={{minio_api_ur}}
+minio.endpoint={{minio_api_url}}
 #minio服务器访问key
 minio.accessKey={{minio_accessKey}}
 #minio服务器访问秘钥
