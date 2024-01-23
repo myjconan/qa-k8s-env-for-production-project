@@ -1,6 +1,8 @@
 #server.address=172.18.9.69
 server.port=8081
 
+5gucp.init.version=2
+
 #server.port=8443
 #spring.thymeleaf.cache=false
 #server.ssl.key-store=zenithKS
