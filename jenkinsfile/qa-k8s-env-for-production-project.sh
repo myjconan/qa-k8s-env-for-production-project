@@ -92,11 +92,15 @@ function git_branch() {
     local token="wjUT7QBsL5vsL-ytGJUr"
     local gitlab_url="gitlab.dahantc.com"
     local project_id=$(db_query_property "git_id" $project_name)
+    local total_git_branch_list="master"
     # printf_std "查询${project_name}的git分支，git_id为${project_id}"
     for i in $(seq 1 11); do
-        local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | tr "\n" "," | sed 's/,$//g')
-        echo "master",$branch_list
+        local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | grep -Ev "master" | tr "\n" "," | sed 's/,$//g')
+        if [[ $branch_list != "" ]]; then
+            total_git_branch_list+=",$branch_list"
+        fi
     done
+    echo $total_git_branch_list
 }
 
 #初始化构建
