@@ -94,7 +94,7 @@ function git_branch() {
     local project_id=$(db_query_property "git_id" $project_name)
     local total_git_branch_list="master"
     # printf_std "查询${project_name}的git分支，git_id为${project_id}"
-    for i in $(seq 1 11); do
+    for i in $(seq 1 20); do
         local branch_list=$(curl -s --header "PRIVATE-TOKEN: ${token}" "http://gitlab.dahantc.com/api/v4/projects/${project_id}/repository/branches?per_page=200&page=$i" | jq -r ".[].name" | grep -Ev "master" | tr "\n" "," | sed 's/,$//g')
         if [[ $branch_list != "" ]]; then
             total_git_branch_list+=",$branch_list"
