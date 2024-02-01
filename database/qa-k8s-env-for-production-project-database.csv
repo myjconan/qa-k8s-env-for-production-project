@@ -9,8 +9,8 @@ ema8-landun-web,1284,gitlab.dahantc.com:ctc-ema80/ctc-ema80-landun/ctc-ema80-web
 ema8-landun-app,1283,gitlab.dahantc.com:ctc-ema80/ctc-ema80-landun/ctc-ema80-app-landun.git,landun,/ema8/landun/,9033,31841,11028,31842
 ema8-sinopec-web,32,gitlab.dahantc.com:ctc-ema80/ctc-ema80-sinopec/ctc-ema80-web-sinopec.git,sinopec,/ema8/sinopec/,9018,31843,11028,31844
 ema8-sinopec-app,30,gitlab.dahantc.com:ctc-ema80/ctc-ema80-sinopec/ctc-ema80-app-sinopec.git,sinopec,/ema8/sinopec/,9019,31845,11028,31846
-ema8-volvo-web,1302,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-web-volvo.git,vlovo-ema8,/ema8/vlovo-ema8/,9041,31802,11041,31803
-ema8-volvo-app,1301,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-app-volvo.git,vlovo-ema8,/ema8/vlovo-ema8/,9042,31804,11042,31805
+ema8-volvo-web,1302,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-web-volvo.git,volvo-ema8,/ema8/volvo-ema8/,9041,31802,11041,31803
+ema8-volvo-app,1301,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-app-volvo.git,volvo-ema8,/ema8/volvo-ema8/,9042,31804,11042,31805
 5gucp-mszq-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,mszq,/ema8/mszq/,9034,31831,11028,31832
 5gucp-mszq-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,mszq,/ema8/mszq/,9035,31833,11028,31834
 5gucp-sdyk-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,yankuang,/ema8/yankuang/,9038,31815,11028,31816
