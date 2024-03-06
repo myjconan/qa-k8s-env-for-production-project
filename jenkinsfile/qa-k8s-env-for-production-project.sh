@@ -28,7 +28,7 @@ property['nacos_username']="dahantc"
 property['nacos_password']="dahantc"
 #jvm
 property['jvm_Xms']="512m"
-property['jvm_Xmx']="1400m"
+property['jvm_Xmx']="3072m"
 
 function error_exit() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') $1" 1>&2
