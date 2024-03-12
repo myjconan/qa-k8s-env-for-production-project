@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
-FROM centos:centos7.9.2009
+# FROM centos:centos7.9.2009
+FROM 172.18.1.157/java/alpine-jdk8-base:8-jdk-alpine3.7
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN mkdir -p {{prefix_dir}}/{{service_dir}}/{{service_type}}/
 COPY mysql-community-client-8.2.0-1.el7.x86_64.rpm {{prefix_dir}}/
