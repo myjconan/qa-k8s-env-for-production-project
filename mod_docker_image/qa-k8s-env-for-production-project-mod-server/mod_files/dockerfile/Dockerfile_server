@@ -5,11 +5,11 @@ FROM 172.18.1.157/java/alpine-jdk8-base:8-jdk-alpine3.7
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN mkdir -p {{prefix_dir}}/{{service_dir}}/{{service_type}}/
 COPY mysql-community-client-8.2.0-1.el7.x86_64.rpm {{prefix_dir}}/
-COPY jdk-8u321-linux-x64.tar.gz {{prefix_dir}}/
-RUN tar -zxvf {{prefix_dir}}/jdk-8u321-linux-x64.tar.gz -C {{prefix_dir}}/
-ENV JAVA_DIR={{prefix_dir}}/jdk1.8.0_321/
-ENV JAVA_HOME=$JAVA_DIR/
-ENV PATH=$PATH:$JAVA_HOME/bin
+# COPY jdk-8u321-linux-x64.tar.gz {{prefix_dir}}/
+# RUN tar -zxvf {{prefix_dir}}/jdk-8u321-linux-x64.tar.gz -C {{prefix_dir}}/
+# ENV JAVA_DIR={{prefix_dir}}/jdk1.8.0_321/
+# ENV JAVA_HOME=$JAVA_DIR/
+# ENV PATH=$PATH:$JAVA_HOME/bin
 COPY *.jar {{prefix_dir}}/{{service_dir}}/{{service_type}}/
 COPY docker_start.sh {{prefix_dir}}/{{service_dir}}/
 COPY BOOT-INF/ {{prefix_dir}}/{{service_dir}}/{{service_type}}/BOOT-INF/
