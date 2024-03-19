@@ -1,6 +1,13 @@
 #server.address=172.18.9.69
 server.port=8081
 
+# 连接器在接受连接后等待请求行的时间 
+server.connection-timeout=9000
+# 最大连接数，默认值10000
+server.tomcat.max-connections=2000
+# 最大线程数，默认200 
+server.tomcat.max-threads=2000
+
 5gucp.init.version=2
 
 #server.port=8443
