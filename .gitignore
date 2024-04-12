@@ -1,0 +1,7 @@
+.DS_Store
+*/.DS_Store
+*screenshot*
+.idea
+.ipynb_checkpoints
+__pycache__/
+~$*
