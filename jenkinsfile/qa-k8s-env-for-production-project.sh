@@ -147,7 +147,14 @@ function init_build() {
     printf_std "准备镜像构建目录"
     cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server/ $mod_docker_image_prefix_path
     mkdir -p $mod_docker_image_path/config/
-    wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $mod_docker_image_path/
+    jdk_file="jdk-8u191-linux-x64.tar.gz"
+    if [ -f "$jdk_file" ]; then
+        printf_std "jdk文件已存在: $jdk_file"
+    else
+        printf_std "jdk文件不存在: $jdk_file，下载文件"
+        wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $mod_docker_image_path/
+    fi
+
 }
 
 #准备镜像
