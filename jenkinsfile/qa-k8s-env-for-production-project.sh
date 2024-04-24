@@ -51,6 +51,10 @@ function db_query_project_type_all() {
     cd $mod_git_base
     git init >/dev/null 2>&1
     git pull http://gitlab.dahantc.com/8574/qa-k8s-env-for-production-project.git >/dev/null 2>&1
+    #恢复git本地仓库误删文件
+    git ls-files -d | xargs echo -e | xargs git checkout --
+    #清除git本地仓库新增文件
+    git checkout . && git clean -xdf
     local col_name="project_name"
     local col_num=$(echo $(head -n 1 $project_database | awk -F "," -v col_name=$col_name '{ for (i=1; i<=NF; i++) if ($i == col_name) print i }'))
     echo $(awk -v FS="," 'NR>1{print $'"$col_num"'}' $project_database | cut -d '-' -f1 | sort -u | xargs | sed 's/[ ][ ]*/,/g' | sed 's/$/,/') #结尾添加分隔符解决jenkins插件active choice返回列表的最后一项无法传递参数的bug
