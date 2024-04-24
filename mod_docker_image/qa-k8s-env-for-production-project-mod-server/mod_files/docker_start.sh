@@ -14,7 +14,7 @@ if [ ! -d "$project_mount_dir" ]; then
     sed -i "s#{{log_path}}#/{{prefix_dir}}/{{service_dir}}/web/logs#g" /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/config/log4j2.xml
     sed -i "s#{{log_path}}#/{{prefix_dir}}/{{service_dir}}/app/logs#g" /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/config/log4j2.xml
     #创建数据库
-    /usr/bin/rpm -ivh --nodeps /{{prefix_dir}}/*.rpm
+    rpm -ivh --nodeps /{{prefix_dir}}/*.rpm
     /usr/bin/mysql -h {{db_host}} -P {{db_port}} -u root -p{{db_root_password}} -s -e "CREATE DATABASE qa_{{project_type}}_{{project_name}} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;CREATE USER 'qa_{{project_type}}_{{project_name}}'@'%' IDENTIFIED BY 'qa_{{project_type}}_{{project_name}}';grant all privileges on qa_{{project_type}}_{{project_name}}.* to 'qa_{{project_type}}_{{project_name}}'@'%';flush privileges;"
 fi
 # 创建挂载软连接
