@@ -2,8 +2,10 @@
 project_mount_dir="/{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/"
 if [ ! -d "$project_mount_dir" ]; then
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource
-    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{web,app}/logs
-    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{web,app}/config
+    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/logs
+    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/config
+    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/logs
+    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/config
     #创建资源文件
     cp -r /{{prefix_dir}}/config/resource/* /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource/
     #创建配置文件
