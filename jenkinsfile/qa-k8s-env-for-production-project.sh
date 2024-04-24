@@ -139,10 +139,12 @@ function init_build() {
         rm -rf $mod_chart_prefix_path/qa124-project-ema80-mod-vue
         cp -r $mod_git_base/mod_chart/qa124-project-ema80-mod-vue $mod_chart_prefix_path
     fi
-    #清除上次构建镜像
+    # 清除上次构建镜像
     printf_std "清除上次构建镜像"
     mkdir -p $mod_docker_image_path
     rm -rf $mod_docker_image_path
+    # 准备镜像构建目录
+    printf_std "准备镜像构建目录"
     cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server/ $mod_docker_image_prefix_path
     mkdir -p $mod_docker_image_path/config/
     wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $mod_docker_image_path/
