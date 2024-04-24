@@ -33,3 +33,6 @@ ema8-beijingmobile-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/projec
 ema8-beijingmobile-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,beijingmobile,/ema8/beijingmobile/,8181,31880,11028,31881
 5gucp-yanshi-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,yanshi,/ema8/yanshi/,8081,31827,11028,31828
 5gucp-yanshi-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,yanshi,/ema8/yanshi/,8181,31829,11028,31830
+5gucp-beijingmobilecloud-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,beijingmobilecloud-5gucp,/ema8/beijingmobilecloud/,80,31882,-1,-1
+5gucp-beijingmobilecloud-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,beijingmobilecloud-5gucp,/ema8/beijingmobilecloud/,8081,31883,11028,31884
+5gucp-beijingmobilecloud-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,beijingmobilecloud-5gucp,/ema8/beijingmobilecloud/,8181,31885,11028,31886
