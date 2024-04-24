@@ -9,6 +9,7 @@ RUN apk update
 RUN apk add rpm
 RUN apk add curl
 RUN apk add busybox-extras
+RUN apk add mysql-client
 # COPY jdk-8u321-linux-x64.tar.gz {{prefix_dir}}/
 # RUN tar -zxvf {{prefix_dir}}/jdk-8u321-linux-x64.tar.gz -C {{prefix_dir}}/
 # ENV JAVA_DIR={{prefix_dir}}/jdk1.8.0_321/
