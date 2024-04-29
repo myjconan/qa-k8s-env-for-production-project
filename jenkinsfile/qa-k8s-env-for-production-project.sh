@@ -156,9 +156,8 @@ function init_build() {
     else
         printf_std "jdk文件不存在: $jdk_file，下载文件"
         wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $jdk_path
-        cp -r $jdk_file $mod_docker_image_path/
     fi
-
+    cp -r $jdk_file $mod_docker_image_path/
 }
 
 #准备镜像
