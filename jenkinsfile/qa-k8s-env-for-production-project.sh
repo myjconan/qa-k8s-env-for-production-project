@@ -8,6 +8,8 @@ project_jenkins_work_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-proj
 mod_chart_prefix_path="/home/k8s/chart/124-qa/"
 mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-project-mod-server/"
+# jdk存放路径
+jdk_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/jdk/"
 # 中间件连接信息
 declare -A property
 #database
@@ -147,12 +149,14 @@ function init_build() {
     printf_std "准备镜像构建目录"
     cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server/ $mod_docker_image_prefix_path
     mkdir -p $mod_docker_image_path/config/
-    jdk_file="jdk-8u191-linux-x64.tar.gz"
+    mkdir -p $jdk_path
+    jdk_file="$jdk_path/jdk-8u191-linux-x64.tar.gz"
     if [ -f "$jdk_file" ]; then
         printf_std "jdk文件已存在: $jdk_file"
     else
         printf_std "jdk文件不存在: $jdk_file，下载文件"
-        wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $mod_docker_image_path/
+        wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $jdk_path
+        cp -r $jdk_file $mod_docker_image_path/
     fi
 
 }
