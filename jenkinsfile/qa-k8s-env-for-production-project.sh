@@ -97,6 +97,8 @@ function git_branch() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') 查询git_branch：$project_name" >>$mod_git_base/jenkinsfile/log.log
     local token=$(echo $(cat /var/jenkins_home/workspace/jenkins/get_project_branch.sh.bak | grep -E 'token=' | awk -F "=" 'NR==1{print $2}'))
     echo $token
+    local token="asd"
+    echo $token
     local gitlab_url="gitlab.dahantc.com"
     local project_id=$(db_query_property "git_id" $project_name)
     local total_git_branch_list="master"
