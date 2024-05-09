@@ -294,6 +294,7 @@ function nacos() {
         db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_5gucp_${project_name}"
         db_property['db_username']="qa_5gucp_${project_name}"
         db_property['db_password']="qa_5gucp_${project_name}"
+        db_property['redis_database']=$(db_query_property "redis_database" $complete_name)
         #web
         mkdir -p $mod_docker_image_path/config/nacos/
         cp $mod_docker_image_path/mod_files/nacos/ctc-5gucp-web-mod $mod_docker_image_path/config/nacos/ctc-5gucp-web.properties
@@ -348,6 +349,7 @@ function ema8_config() {
     db_property['db_url']="${property['db_host']}:${property['db_port']}/qa_${project_type}_${project_name}"
     db_property['db_username']="qa_${project_type}_${project_name}"
     db_property['db_password']="qa_${project_type}_${project_name}"
+    # db_property['redis_database']=$(db_query_property "redis_database" $complete_name) 老版本不能配置redis数据库
     mkdir -p $mod_docker_image_path/config/{web,app}/
     cp -r $mod_docker_image_path/mod_files/resource $mod_docker_image_path/config/
     cp $mod_docker_image_path/mod_files/configs_in_docker/ema8/web/* $mod_docker_image_path/config/web/
