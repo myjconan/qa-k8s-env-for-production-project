@@ -10,6 +10,7 @@ mod_docker_image_prefix_path="/home/k8s/build/project_image/"
 mod_docker_image_path="$mod_docker_image_prefix_path/qa-k8s-env-for-production-project-mod-server/"
 # jdk存放路径
 jdk_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/jdk/"
+mysql_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/mysql/"
 # 中间件连接信息
 declare -A property
 #database
@@ -149,6 +150,7 @@ function init_build() {
     printf_std "准备镜像构建目录"
     cp -r $mod_git_base/mod_docker_image/qa-k8s-env-for-production-project-mod-server/ $mod_docker_image_prefix_path
     mkdir -p $mod_docker_image_path/config/
+    # 准备jdk安装包
     mkdir -p $jdk_path
     jdk_file="$jdk_path/jdk-8u191-linux-x64.tar.gz"
     if [ -f "$jdk_file" ]; then
@@ -158,6 +160,16 @@ function init_build() {
         wget https://mirrors.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.tar.gz -P $jdk_path
     fi
     cp -r $jdk_file $mod_docker_image_path/
+    # 准备mysql_client安装包
+    mkdir -p $mysql_path
+    mysql_file="$mysql_path/mysql-community-client-8.0.29-1.el7.x86_64.rpm"
+    if [ -f "$mysql_file" ]; then
+        printf_std "mysql_client文件已存在: $mysql_file"
+    else
+        printf_std "mysql_client文件不存在: $mysql_file，下载文件"
+        wget https://mirrors.huaweicloud.com/mysql/Downloads/MySQL-8.0/mysql-community-client-8.0.29-1.el7.x86_64.rpm -P $mysql_path
+    fi
+    cp -r $mysql_file $mod_docker_image_path/
 }
 
 #准备镜像
