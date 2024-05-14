@@ -13,8 +13,8 @@ jdk_path="/var/jenkins_home/jobs/qa-k8s-env-for-production-project/jdk/"
 # 中间件连接信息
 declare -A property
 #database
-property['db_host']="172.18.1.190"
-property['db_port']="30336"
+property['db_host']="172.18.1.79"
+property['db_port']="3306"
 property['db_root_password']="123456"
 #redis
 property['redis_host']="172.18.1.190"
