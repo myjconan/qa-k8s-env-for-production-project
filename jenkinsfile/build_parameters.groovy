@@ -1,5 +1,5 @@
 /* groovylint-disable DeadCode, LineLength, NglParseError, VariableTypeRequired */
-//生产项目k8s测试环境构建（非信创）。支持ema8、5gucp9.4x、5gucp10.5x项目类型。
+//生产项目k8s测试环境构建（非信创）。支持ema8、5gucp9.x、5gucp10.x项目类型。
 //project_type
 //Active Choices Parameter
 def list = ' bash  /var/jenkins_home/jobs/qa-k8s-env-for-production-project/mod_git_base/jenkinsfile/qa-k8s-env-for-production-project.sh db_query_project_type_all'.execute().in.text
