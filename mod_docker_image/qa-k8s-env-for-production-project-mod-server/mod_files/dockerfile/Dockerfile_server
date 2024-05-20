@@ -10,7 +10,7 @@ FROM centos:centos7.9.2009
 # 时区
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 # mysql客户端
-COPY mysql-community-client-8.2.0-1.el7.x86_64.rpm {{prefix_dir}}/
+COPY *.rpm {{prefix_dir}}/
 # jdk环境
 COPY jdk-8u321-linux-x64.tar.gz {{prefix_dir}}/
 RUN tar -zxvf {{prefix_dir}}/jdk-8u321-linux-x64.tar.gz -C {{prefix_dir}}/
