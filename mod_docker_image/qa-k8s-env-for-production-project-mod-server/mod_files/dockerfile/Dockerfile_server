@@ -12,7 +12,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 # mysql客户端
 COPY *.rpm {{prefix_dir}}/
 # jdk环境
-COPY jdk-8u321-linux-x64.tar.gz {{prefix_dir}}/
+COPY *.tar.gz {{prefix_dir}}/
 RUN tar -zxvf {{prefix_dir}}/jdk-8u321-linux-x64.tar.gz -C {{prefix_dir}}/
 ENV JAVA_DIR={{prefix_dir}}/jdk1.8.0_321/
 ENV JAVA_HOME=$JAVA_DIR/
