@@ -208,7 +208,7 @@ function prepare_for_docker_image() {
         echo -e "const baseUrl = 'http://172.18.1.190:$web_server_httpnodePort'\nwindow._BASE_URL = baseUrl;" >>$mod_docker_image_path/dist/config.js
         #准备dockerfile
         printf_std "准备dockerfile"
-        cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_vue $mod_docker_image_path/Dockerfile
+        cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_vue.dockerfile $mod_docker_image_path/Dockerfile
         sed -i 's#{{service_port}}#$service_port#' $mod_docker_image_path/Dockerfile
         #准备conf
         printf_std "准备conf"
@@ -220,7 +220,7 @@ function prepare_for_docker_image() {
         cp $project_jenkins_work_path/target/*.jar $mod_docker_image_path
         #准备dockerfile
         printf_std "准备dockerfile"
-        cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_server $mod_docker_image_path/Dockerfile
+        cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_server.dockerfile $mod_docker_image_path/Dockerfile
         for key in $(echo ${!docker_image_property[*]}); do
             sed -i "s#{{$key}}#${docker_image_property[$key]}#g" "$mod_docker_image_path/Dockerfile"
         done
