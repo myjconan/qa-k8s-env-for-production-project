@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM 172.18.1.157/public/alpine-for-mod-5gucp:v1
+FROM 172.18.1.157/public/alpine-for-mod-5gucp:v2
 # 基础镜像环境
 # FROM 172.18.1.157/java/alpine-jdk8-base:8-jdk-alpine3.7
 # RUN apk update
