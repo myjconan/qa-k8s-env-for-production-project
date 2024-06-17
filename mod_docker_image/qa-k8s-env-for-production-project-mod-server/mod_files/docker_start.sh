@@ -2,9 +2,7 @@
 project_mount_dir="/{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/"
 if [ ! -d "$project_mount_dir" ]; then
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource
-    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/logs
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/web/config
-    mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/logs
     mkdir -p /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/app/config
     #创建资源文件
     cp -r /{{prefix_dir}}/config/resource/* /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource/
@@ -17,9 +15,11 @@ if [ ! -d "$project_mount_dir" ]; then
     # rpm -ivh --nodeps /{{prefix_dir}}/*.rpm
     /usr/bin/mysql -h {{db_host}} -P {{db_port}} -u root -p{{db_root_password}} -s -e "CREATE DATABASE qa_{{project_type}}_{{project_name}} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;CREATE USER 'qa_{{project_type}}_{{project_name}}'@'%' IDENTIFIED BY 'qa_{{project_type}}_{{project_name}}';grant all privileges on qa_{{project_type}}_{{project_name}}.* to 'qa_{{project_type}}_{{project_name}}'@'%';flush privileges;"
 fi
+# 创建日志路径
+mkdir -p /{{prefix_dir}}/logs/{{project_type}}/{{resource_name}}/{{service_type}}/logs
 # 创建挂载软连接
+ln -s /{{prefix_dir}}/logs/{{project_type}}/{{resource_name}}/{{service_type}}/logs /{{prefix_dir}}/{{service_dir}}/{{service_type}}/logs
 ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/resource /{{prefix_dir}}/{{service_dir}}/resource
-ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/logs /{{prefix_dir}}/{{service_dir}}/{{service_type}}/logs
 ln -s /{{prefix_dir}}/nfs/{{project_type}}/{{resource_name}}/{{service_type}}/config /{{prefix_dir}}/{{service_dir}}/{{service_type}}/config
 # 修改应用ip为本机
 app_proper_files=$(cd /{{prefix_dir}}/{{service_dir}}/{{service_type}}/config/ && ls application.properties 2>/dev/null | wc -l)

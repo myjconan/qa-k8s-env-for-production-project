@@ -33,8 +33,8 @@ spec:
         volumeMounts:
         - mountPath: /home/tong/nfs/
           name: resource
-        # - mountPath: /home/tong/logs/
-        #   name: logs
+        - mountPath: /home/tong/logs/
+          name: logs
         ports:
         - containerPort: {{ .Values.service.port }}
         - containerPort: 11098
@@ -91,7 +91,8 @@ spec:
         nfs:
           path: /home/mod-5gucp
           server: 172.18.1.190 
-      # - name: logs
-      #   hostPath:
-      #     path: /home/mod-5gucp
+      - name: logs
+        hostPath:
+          path: /home/5gucp-project-log
+          type: DirectoryOrCreate
 
