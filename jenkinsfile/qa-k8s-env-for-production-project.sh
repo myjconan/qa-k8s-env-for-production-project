@@ -209,7 +209,7 @@ function prepare_for_docker_image() {
         #准备dockerfile
         printf_std "准备dockerfile"
         cp $mod_docker_image_path/mod_files/dockerfile/Dockerfile_vue.dockerfile $mod_docker_image_path/Dockerfile
-        sed -i "s#{{service_port}}#${service_port}#g" $mod_docker_image_path/Dockerfile
+        sed -i "s#{{service_port}}#${docker_image_property['service_port']}#g" $mod_docker_image_path/Dockerfile
         #准备conf
         printf_std "准备conf"
         cp $mod_docker_image_path/mod_files/nginx/default.conf $mod_docker_image_path
