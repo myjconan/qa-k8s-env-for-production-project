@@ -23,7 +23,7 @@ ema8-volvo-app,1301,gitlab.dahantc.com:ctc-ema80/ctc-ema80-volvo/ctc-ema80-app-v
 5gucp-gjtsg-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,gjtsg,/ema8/gjtsg/,80,-1,-1,-1,10
 5gucp-gjtsg-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,gjtsg,/ema8/gjtsg/,8081,-1,-1,-1,10
 5gucp-gjtsg-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,gjtsg,/ema8/gjtsg/,8181,-1,-1,-1,10
-5gucp-ctzg-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,ctzg-5gucp,/ema8/sqlTest/,9045,31806,-1,-1,11
+5gucp-ctzg-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,ctzg-5gucp,/ema8/sqlTest/,80,31806,-1,-1,11
 5gucp-ctzg-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,ctzg-5gucp,/ema8/sqlTest/,9088,31807,11028,31808,11
 5gucp-ctzg-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,ctzg-5gucp,/ema8/sqlTest/,9089,31809,11028,31810,11
 5gucp-proddeptqaenv-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,proddeptqaenv,/ema8/proddeptqaenv/,80,31868,-1,-1,12
