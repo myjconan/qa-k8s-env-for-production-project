@@ -213,6 +213,9 @@ function prepare_for_docker_image() {
         #准备conf
         printf_std "准备conf"
         cp $mod_docker_image_path/mod_files/nginx/default.conf $mod_docker_image_path
+        for key in $(echo ${!docker_image_property[*]}); do
+            sed -i "s#{{$key}}#${docker_image_property[$key]}#g" "$mod_docker_image_path/default.conf"
+        done
         echo "$complete_name 镜像准备工作完成"
     else
         #准备jar包
