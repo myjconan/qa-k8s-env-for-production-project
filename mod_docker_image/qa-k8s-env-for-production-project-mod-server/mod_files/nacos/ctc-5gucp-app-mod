@@ -103,6 +103,26 @@ redisson.singleServerConfig.dnsMonitoringInterval=5000
 redisson.threads=0
 redisson.nettyThreads=0
 
+# 以下是哨兵模式配置方式
+# redisson.sentinelServersConfig.idleConnectionTimeout=10000
+# redisson.sentinelServersConfig.connectTimeout=10000
+# redisson.sentinelServersConfig.timeout=3000
+# redisson.sentinelServersConfig.retryAttempts=3
+# redisson.sentinelServersConfig.retryInterval=1500
+# redisson.sentinelServersConfig.password=dahantc.com
+# redisson.sentinelServersConfig.subscriptionsPerConnection=100
+# redisson.sentinelServersConfig.clientName=null
+# redisson.sentinelServersConfig.masterName=mymaster
+# redisson.sentinelServersConfig.slaveConnectionMinimumIdleSize=32
+# redisson.sentinelServersConfig.slaveConnectionPoolSize=64
+# redisson.sentinelServersConfig.masterConnectionMinimumIdleSize=320
+# redisson.sentinelServersConfig.masterConnectionPoolSize=640
+# redisson.sentinelServersConfig.readMode=MASTER_SLAVE
+# redisson.sentinelServersConfig.sentinelAddresses[0]:redis://172.18.9.83:6379
+# redisson.sentinelServersConfig.sentinelAddresses[1]:redis://172.18.9.83:6380
+# redisson.sentinelServersConfig.database=0
+# redisson.threads=0
+# redisson.nettyThreads=0
 
 # redis.available 为false时，需要排查Redisson自动配置类， 开启配置
 # spring.autoconfigure.exclude=org.redisson.spring.starter.RedissonAutoConfiguration
