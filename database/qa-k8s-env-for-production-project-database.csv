@@ -36,3 +36,14 @@ ema8-beijingmobile-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/projec
 5gucp-beijingmobilecloud-vue,1333,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-5gucp-web.git,beijingmobilecloud-5gucp,/ema8/beijingmobilecloud/,80,31882,-1,-1,15
 5gucp-beijingmobilecloud-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,beijingmobilecloud-5gucp,/ema8/beijingmobilecloud/,8081,31883,11028,31884,15
 5gucp-beijingmobilecloud-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,beijingmobilecloud-5gucp,/ema8/beijingmobilecloud/,8181,31885,11028,31886,15
+ema8-chinaunicom-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,chinaunicom-ema8,/ema8/chinaunicom-ema8/,8081,31887,11028,31888,16
+ema8-chinaunicom-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,chinaunicom-ema8,/ema8/chinaunicom-ema8/,8181,31889,11028,31890,16
+ema8-zyzg-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,zyzg-ema8,/ema8/zyzg-ema8/,8081,31891,11028,31892,17
+ema8-zyzg-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,zyzg-ema8,/ema8/zyzg-ema8/,8181,31893,11028,31894,17
+ema8-cdxyzl-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,cdxyzl-ema8,/ema8/cdxyzl-ema8/,8081,31895,11028,31896,18
+ema8-cdxyzl-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,cdxyzl-ema8,/ema8/cdxyzl-ema8/,8181,31897,11028,31898,18
+ema8-nanyangbank-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,nanyangbank-ema8,/ema8/nanyangbank-ema8/,8081,31899,11028,31900,19
+ema8-nanyangbank-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,nanyangbank-ema8,/ema8/nanyangbank-ema8/,8181,31901,11028,31902,19
+ema8-zdry-web,67,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-web.git,zdry-ema8,/ema8/zdry-ema8/,8081,31903,11028,31904,20
+ema8-zdry-app,63,gitlab.dahantc.com:ctc-ema80/ctc-ema80-standard/project/ctc-ema80-app.git,zdry-ema8,/ema8/zdry-ema8/,8181,31905,11028,31906,20
+ema8-guosen-web,1725,gitlab.dahantc.com:ctc-ema80/ctc-ema80-guosen/ctc-ema80-guosen-middleware.git,guosen-ema8,/ema8/guosen-ema8/,8081,31907,11028,31908,21
